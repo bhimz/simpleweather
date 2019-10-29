@@ -34,12 +34,18 @@ import org.koin.test.KoinTest
 class MainActivityTest : KoinTest {
 
     @get:Rule
-    val activityRule: ActivityTestRule<MainActivity> = ActivityTestRule(MainActivity::class.java, true, false)
+    val activityRule: ActivityTestRule<MainActivity> =
+        ActivityTestRule(MainActivity::class.java, true, false)
+    private val dummyWeatherApi = DummyWeatherApi()
 
     @Before
     fun setUp() {
         loadKoinModules(
-            listOf(appModule, testNetModule)
+            listOf(appModule, module {
+                single<WeatherApi> {
+                    dummyWeatherApi
+                }
+            })
         )
     }
 
@@ -50,8 +56,13 @@ class MainActivityTest : KoinTest {
 
     @Test
     fun testLoadCurrentLocation() {
+        //given
+        dummyWeatherApi.mockResponse = dummyResponse
+        //when
+        //main activity is launched
         activityRule.launchActivity(null)
         Thread.sleep(3000)
+        //then
         onView(withId(R.id.weatherListView)).check { view, noViewFoundException ->
             if (noViewFoundException != null) throw noViewFoundException
             val recyclerView = view as RecyclerView
@@ -61,25 +72,25 @@ class MainActivityTest : KoinTest {
             }
         }
 
-        onView(withRecyclerView(R.id.weatherListView)
-            .atPosition(0))
+        onView(
+            withRecyclerView(R.id.weatherListView)
+                .atPosition(0)
+        )
             .check(matches(hasDescendant(withText("Clear"))))
-        onView(withRecyclerView(R.id.weatherListView)
-            .atPosition(0))
+        onView(
+            withRecyclerView(R.id.weatherListView)
+                .atPosition(0)
+        )
             .check(matches(hasDescendant(withText("10.61° C"))))
-        onView(withRecyclerView(R.id.weatherListView)
-            .atPosition(0))
+        onView(
+            withRecyclerView(R.id.weatherListView)
+                .atPosition(0)
+        )
             .check(matches(hasDescendant(withText("JAN 31"))))
     }
 
 
-    private val testNetModule =  module {
-        single {
-            dummyApi
-        }
-    }
-
-    val dummyResponse = "{\n" +
+    private val dummyResponse = "{\n" +
             "  \"cod\": \"200\",\n" +
             "  \"message\": 0.0082,\n" +
             "  \"cnt\": 40,\n" +
@@ -261,13 +272,14 @@ class MainActivityTest : KoinTest {
             "  }\n" +
             "}"
 
-    val dummyApi = object : WeatherApi {
+    class DummyWeatherApi : WeatherApi {
+        var mockResponse = ""
         override suspend fun getWeatherForecast(
             latitude: Double,
             longitude: Double,
             appId: String
         ): WeatherApiResponse {
-            return Gson().fromJson(dummyResponse, WeatherApiResponse::class.java)
+            return Gson().fromJson(mockResponse, WeatherApiResponse::class.java)
         }
 
     }
