@@ -2,6 +2,7 @@ package com.bhimz.simpleweather
 
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.*
+import androidx.test.espresso.assertion.ViewAssertions.*
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
@@ -58,5 +59,9 @@ class MainActivityTest : KoinTest {
                 assertTrue(itemCount > 0)
             }
         }
+
+        onView(withRecyclerView(R.id.weatherListView)
+            .atPosition(0))
+            .check(matches(hasDescendant(withText("Clear"))))
     }
 }
