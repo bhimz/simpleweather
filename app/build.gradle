@@ -18,7 +18,11 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            buildConfigField "String", "PLACES_API_KEY", "\"AIzaSyBrPNUo2Km3yRNn1lHFvfx_uFcACeoVjXo\""
+        }
         release {
+            buildConfigField "String", "PLACES_API_KEY", "\"AIzaSyBrPNUo2Km3yRNn1lHFvfx_uFcACeoVjXo\""
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -52,6 +56,9 @@ dependencies {
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 
     //Koin
-    // Koin for Android
     implementation "org.koin:koin-android:$koin_version"
+
+    //Places API
+    implementation 'com.google.android.libraries.places:places:2.0.0'
+
 }
