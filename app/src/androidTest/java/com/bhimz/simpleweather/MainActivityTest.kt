@@ -55,7 +55,7 @@ class MainActivityTest : KoinTest {
             val recyclerView = view as RecyclerView
             assertTrue("adapter should not be null", recyclerView.adapter != null)
             recyclerView.adapter?.run {
-                assertEquals(5, this.itemCount)
+                assertTrue(itemCount > 0)
             }
         }
     }

@@ -2,11 +2,59 @@ package com.bhimz.simpleweather
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.bhimz.simpleweather.domain.model.Weather
+import com.bhimz.simpleweather.domain.service.WeatherService
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import kotlin.coroutines.CoroutineContext
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CoroutineScope {
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main
+
+    private var weatherList = listOf<Weather>()
+
+    private val weatherService: WeatherService by inject()
+
+    private val weatherAdapter = object : RecyclerView.Adapter<WeatherViewHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeatherViewHolder {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.view_weather_listitem, parent, false)
+            return WeatherViewHolder(view)
+        }
+
+        override fun getItemCount(): Int = weatherList.size
+
+        override fun onBindViewHolder(holder: WeatherViewHolder, position: Int) {
+            val weather = weatherList[position]
+            holder.bind(weather)
+        }
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        weatherListView.adapter = weatherAdapter
+    }
+
+    override fun onStart() {
+        super.onStart()
+        launch {
+            weatherList = weatherService.getWeather(35.0, 139.0) ?: listOf()
+            weatherAdapter.notifyDataSetChanged()
+        }
+    }
+
+    class WeatherViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        fun bind(weather: Weather) {
+
+        }
     }
 }
