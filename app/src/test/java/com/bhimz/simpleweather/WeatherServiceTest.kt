@@ -1,7 +1,8 @@
 package com.bhimz.simpleweather
 
-import com.bhimz.simpleweather.domain.appModule
+import com.bhimz.simpleweather.di.appModule
 import com.bhimz.simpleweather.domain.service.WeatherService
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Test
 
@@ -38,10 +39,15 @@ class WeatherServiceTest: KoinTest {
         //given
         val cityName = "London"
 
-        //when
-        val weatherList = weatherService.getWeather(cityName)
-        assertTrue("weather should not be null", weatherList != null)
-        assertTrue("list should not be empty", weatherList!!.isNotEmpty())
+        runBlocking {
+            //when
+            val weatherList = weatherService.getWeather(cityName, "us")
+
+            //then
+            assertTrue("weather should not be null", weatherList != null)
+            assertTrue("list should not be empty", weatherList!!.isNotEmpty())
+            assertEquals("city name should match", cityName, weatherList[0].city)
+        }
 
     }
 }
