@@ -60,7 +60,7 @@ class MainActivityTest : KoinTest {
             val recyclerView = view as RecyclerView
             assertTrue("adapter should not be null", recyclerView.adapter != null)
             recyclerView.adapter?.run {
-                assertTrue(itemCount > 0)
+                assertEquals("data size should match", 5, itemCount)
             }
         }
 
