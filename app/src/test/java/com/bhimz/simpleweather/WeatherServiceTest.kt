@@ -37,16 +37,16 @@ class WeatherServiceTest: KoinTest {
     @Test
     fun testGetWeather() {
         //given
-        val cityName = "London"
+        val lat = 35.0
+        val lon = 139.0
 
         runBlocking {
             //when
-            val weatherList = weatherService.getWeather(cityName, "us")
+            val weatherList = weatherService.getWeather(lat, lon)
 
             //then
             assertTrue("weather should not be null", weatherList != null)
             assertTrue("list should not be empty", weatherList!!.isNotEmpty())
-            assertEquals("city name should match", cityName, weatherList[0].city)
         }
 
     }
