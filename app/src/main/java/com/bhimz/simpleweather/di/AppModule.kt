@@ -18,6 +18,12 @@ val appModule = module {
         Places.initialize(ctx, BuildConfig.PLACES_API_KEY)
         Places.createClient(ctx)
     }
+    factory {
+        WeatherService(get())
+    }
+}
+
+val netModule = module {
     single<Interceptor> {
         val interceptor = HttpLoggingInterceptor()
         interceptor.level = HttpLoggingInterceptor.Level.HEADERS
@@ -36,8 +42,5 @@ val appModule = module {
     }
     single {
         (get<Retrofit>().create(WeatherApi::class.java))
-    }
-    factory {
-        WeatherService(get())
     }
 }

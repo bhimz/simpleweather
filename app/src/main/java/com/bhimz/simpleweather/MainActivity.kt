@@ -15,6 +15,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import java.text.DecimalFormat
+import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity(), CoroutineScope {
@@ -56,8 +58,15 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     }
 
     class WeatherViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val tempFormat by lazy { DecimalFormat("###.##") }
+        private val monthNames by lazy { listOf("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC") }
         fun bind(weather: Weather) {
             itemView.weatherText.text = weather.weather
+            val tempInCelcius = weather.temperature - 273.15
+            itemView.temperatureText.text = "${tempFormat.format(tempInCelcius)}° C"
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = weather.date * 1000
+            itemView.forecastDateText.text = "${monthNames[calendar.get(Calendar.MONTH)]} ${calendar.get(Calendar.DATE)}"
         }
     }
 }

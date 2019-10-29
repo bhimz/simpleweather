@@ -1,6 +1,7 @@
 package com.bhimz.simpleweather
 
 import com.bhimz.simpleweather.di.appModule
+import com.bhimz.simpleweather.di.netModule
 import com.bhimz.simpleweather.domain.service.WeatherService
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -25,7 +26,7 @@ class WeatherServiceTest: KoinTest {
     fun setUp() {
         stopKoin()
         startKoin {
-            modules(listOf(appModule))
+            modules(listOf(appModule, netModule))
         }
     }
 
