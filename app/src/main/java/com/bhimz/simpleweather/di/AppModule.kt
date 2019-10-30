@@ -3,6 +3,7 @@ package com.bhimz.simpleweather.di
 import com.bhimz.simpleweather.BuildConfig
 import com.bhimz.simpleweather.WeatherViewModel
 import com.bhimz.simpleweather.domain.net.WeatherApi
+import com.bhimz.simpleweather.domain.repository.LocationRepository
 import com.bhimz.simpleweather.domain.repository.WeatherRepository
 import com.google.android.libraries.places.api.Places
 import okhttp3.Interceptor
@@ -22,6 +23,9 @@ val appModule = module {
     }
     factory {
         WeatherRepository(get())
+    }
+    factory {
+        LocationRepository()
     }
     viewModel {
         WeatherViewModel(get())

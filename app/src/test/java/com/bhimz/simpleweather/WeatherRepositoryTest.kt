@@ -24,7 +24,6 @@ class WeatherRepositoryTest: KoinTest {
 
     @Before
     fun setUp() {
-        stopKoin()
         startKoin {
             modules(listOf(appModule, netModule))
         }
