@@ -119,11 +119,36 @@ class LocationRepositoryTest : KoinTest {
                 val savedLocations = locationRepository.getAllLocations()
 
                 //then
-                assertEquals("saved locations size should match given", locations.size, savedLocations.size)
-                savedLocations.forEachIndexed { i, location ->
-                    assertEquals("saved location-$i location name should match", locations[i].locationName, location.locationName)
-                    assertEquals("saved location-$i latitude should match", locations[i].latitude, location.latitude, 0.0001)
-                    assertEquals("saved location-$i longitude should match", locations[i].longitude, location.longitude, 0.0001)
+                assertEquals(
+                    "saved locations size should match given",
+                    locations.size,
+                    savedLocations.size
+                )
+                val sortedLocations = locations.toMutableList().sortedBy { it.locationName }
+                sortedLocations.forEach { location ->
+                    val savedLocation =
+                        savedLocations.find { it.locationName == location.locationName }
+                    assertTrue(
+                        "should contain saved location-${location.locationName}",
+                        savedLocation != null
+                    )
+                    assertEquals(
+                        "saved location-${location.locationName} location name should match",
+                        location.locationName,
+                        savedLocation!!.locationName
+                    )
+                    assertEquals(
+                        "saved location-${location.locationName} latitude should match",
+                        location.latitude,
+                        savedLocation.latitude,
+                        0.0001
+                    )
+                    assertEquals(
+                        "saved location-${location.locationName} longitude should match",
+                        location.longitude,
+                        savedLocation.longitude,
+                        0.0001
+                    )
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

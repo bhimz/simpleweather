@@ -8,11 +8,10 @@ class LocationRepository(private val locationDao: LocationDao) {
     suspend fun saveLocation(location: Location) =
         locationDao.insertLocationData(location.toLocationData())
 
-    fun getAllLocations(): List<Location> = listOf()
+    suspend fun getAllLocations(): List<Location> =
+        locationDao.getAllLocations().map { it.toLocation() }
 }
 
-fun Location.toLocationData(): LocationData {
-    return LocationData(
-        locationName, latitude, longitude
-    )
-}
+fun Location.toLocationData(): LocationData = LocationData(locationName, latitude, longitude)
+
+fun LocationData.toLocation(): Location = Location(locationName, latitude, longitude)
