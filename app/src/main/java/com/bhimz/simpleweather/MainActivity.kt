@@ -61,9 +61,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
     override fun onStart() {
         super.onStart()
-        launch {
-            viewModel.loadCurrentLocationWeather()
-        }
+        viewModel.loadCurrentLocationWeather()
     }
 
     class WeatherViewHolder(val binding: ViewWeatherListitemBinding) : RecyclerView.ViewHolder(binding.root)

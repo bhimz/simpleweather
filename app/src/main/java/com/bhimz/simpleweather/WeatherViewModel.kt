@@ -3,8 +3,10 @@ package com.bhimz.simpleweather
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.bhimz.simpleweather.domain.model.Weather
 import com.bhimz.simpleweather.domain.repository.WeatherRepository
+import kotlinx.coroutines.launch
 
 class WeatherViewModel(private val weatherRepository: WeatherRepository) : ViewModel() {
     private val _locationName = MutableLiveData<String>().apply { value = "" }
@@ -13,7 +15,7 @@ class WeatherViewModel(private val weatherRepository: WeatherRepository) : ViewM
     val locationName: LiveData<String> = _locationName
     val weatherList: LiveData<List<Weather>> = _weatherList
 
-    suspend fun loadCurrentLocationWeather() {
+    fun loadCurrentLocationWeather() = viewModelScope.launch {
         val weatherListUpdate = weatherRepository.getWeather(35.0, 139.0) ?: listOf()
         _weatherList.value = weatherListUpdate
     }

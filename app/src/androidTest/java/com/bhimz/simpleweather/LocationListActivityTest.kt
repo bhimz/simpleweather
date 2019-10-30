@@ -6,6 +6,7 @@ import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import com.bhimz.simpleweather.di.appModule
 import com.bhimz.simpleweather.di.testDbModule
@@ -14,7 +15,8 @@ import com.bhimz.simpleweather.domain.repository.LocationRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.*
 import org.junit.runner.RunWith
-import org.koin.core.context.loadKoinModules
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.inject
@@ -31,7 +33,11 @@ class LocationListActivityTest : KoinTest {
 
     @Before
     fun setUp() {
-        loadKoinModules(listOf(appModule, testDbModule))
+        stopKoin()
+        startKoin {
+            androidContext(InstrumentationRegistry.getInstrumentation().context)
+            modules(listOf(appModule, testDbModule))
+        }
     }
 
     @After

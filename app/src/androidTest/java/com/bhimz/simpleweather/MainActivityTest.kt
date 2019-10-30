@@ -6,6 +6,7 @@ import androidx.test.espresso.assertion.ViewAssertions.*
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import com.bhimz.simpleweather.di.appModule
 import com.bhimz.simpleweather.di.testDbModule
@@ -20,7 +21,9 @@ import org.junit.runner.RunWith
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
+import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
@@ -41,13 +44,15 @@ class MainActivityTest : KoinTest {
 
     @Before
     fun setUp() {
-        loadKoinModules(
-            listOf(appModule, module {
+        stopKoin()
+        startKoin {
+            androidContext(InstrumentationRegistry.getInstrumentation().context)
+            modules(listOf(appModule, module {
                 single<WeatherApi> {
                     dummyWeatherApi
                 }
-            }, testDbModule)
-        )
+            }, testDbModule))
+        }
     }
 
     @After
