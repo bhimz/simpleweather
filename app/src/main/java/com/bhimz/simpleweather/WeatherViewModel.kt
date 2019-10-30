@@ -13,7 +13,7 @@ class WeatherViewModel(private val weatherService: WeatherService) : ViewModel()
     val locationName: LiveData<String> = _locationName
     val weatherList: LiveData<List<Weather>> = _weatherList
 
-    suspend fun loadCurrentWeather() {
+    suspend fun loadCurrentLocationWeather() {
         val weatherListUpdate = weatherService.getWeather(35.0, 139.0) ?: listOf()
         _weatherList.value = weatherListUpdate
     }

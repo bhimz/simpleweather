@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     override fun onStart() {
         super.onStart()
         launch {
-            viewModel.loadCurrentWeather()
+            viewModel.loadCurrentLocationWeather()
         }
     }
 
