@@ -1,7 +1,9 @@
 package com.bhimz.simpleweather.di
 
+import androidx.room.Room
 import com.bhimz.simpleweather.BuildConfig
 import com.bhimz.simpleweather.WeatherViewModel
+import com.bhimz.simpleweather.domain.db.AppDatabase
 import com.bhimz.simpleweather.domain.net.WeatherApi
 import com.bhimz.simpleweather.domain.repository.LocationRepository
 import com.bhimz.simpleweather.domain.repository.WeatherRepository
@@ -21,11 +23,12 @@ val appModule = module {
         Places.initialize(ctx, BuildConfig.PLACES_API_KEY)
         Places.createClient(ctx)
     }
+    single { get<AppDatabase>().locationDao() }
     factory {
         WeatherRepository(get())
     }
     factory {
-        LocationRepository()
+        LocationRepository(get())
     }
     viewModel {
         WeatherViewModel(get())
@@ -52,4 +55,12 @@ val netModule = module {
     single {
         (get<Retrofit>().create(WeatherApi::class.java))
     }
+}
+
+val dbModule = module {
+    single { Room.databaseBuilder(get(), AppDatabase::class.java, "weather-db").build() }
+}
+
+val testDbModule = module {
+    single { Room.inMemoryDatabaseBuilder(get(), AppDatabase::class.java).build() }
 }
