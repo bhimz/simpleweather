@@ -1,4 +1,4 @@
-package com.bhimz.simpleweather.domain
+package com.bhimz.simpleweather.domain.net
 
 import com.bhimz.simpleweather.domain.model.WeatherApiResponse
 import retrofit2.http.GET

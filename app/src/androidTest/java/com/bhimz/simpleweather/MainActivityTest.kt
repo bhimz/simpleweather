@@ -8,7 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import com.bhimz.simpleweather.di.appModule
-import com.bhimz.simpleweather.domain.WeatherApi
+import com.bhimz.simpleweather.domain.net.WeatherApi
 import com.bhimz.simpleweather.domain.model.WeatherApiResponse
 import com.google.gson.Gson
 import org.junit.After

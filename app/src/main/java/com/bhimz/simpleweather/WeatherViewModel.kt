@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bhimz.simpleweather.domain.model.Weather
-import com.bhimz.simpleweather.domain.service.WeatherService
+import com.bhimz.simpleweather.domain.repository.WeatherRepository
 
-class WeatherViewModel(private val weatherService: WeatherService) : ViewModel() {
+class WeatherViewModel(private val weatherRepository: WeatherRepository) : ViewModel() {
     private val _locationName = MutableLiveData<String>().apply { value = "" }
     private val _weatherList = MutableLiveData<List<Weather>>().apply { value = listOf() }
 
@@ -14,7 +14,7 @@ class WeatherViewModel(private val weatherService: WeatherService) : ViewModel()
     val weatherList: LiveData<List<Weather>> = _weatherList
 
     suspend fun loadCurrentLocationWeather() {
-        val weatherListUpdate = weatherService.getWeather(35.0, 139.0) ?: listOf()
+        val weatherListUpdate = weatherRepository.getWeather(35.0, 139.0) ?: listOf()
         _weatherList.value = weatherListUpdate
     }
 }

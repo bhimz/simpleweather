@@ -1,9 +1,9 @@
-package com.bhimz.simpleweather.domain.service
+package com.bhimz.simpleweather.domain.repository
 
-import com.bhimz.simpleweather.domain.WeatherApi
+import com.bhimz.simpleweather.domain.net.WeatherApi
 import com.bhimz.simpleweather.domain.model.Weather
 
-class WeatherService(
+class WeatherRepository(
     private val weatherApi: WeatherApi
 ) {
     suspend fun getWeather(latitude: Double, longitude: Double): List<Weather>? {

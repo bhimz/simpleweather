@@ -16,6 +16,15 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "com.bhimz.simpleweather.TestAppJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        "room.schemaLocation":"$projectDir/schemas".toString(),
+                        "room.incremental":"true",
+                        "room.expandProjection":"true"]
+            }
+        }
     }
     buildTypes {
         debug {
@@ -75,5 +84,10 @@ dependencies {
 
     //Places API
     implementation 'com.google.android.libraries.places:places:2.0.0'
+
+    //Room Database
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
 
 }

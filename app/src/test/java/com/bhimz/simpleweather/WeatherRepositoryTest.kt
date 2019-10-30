@@ -2,7 +2,7 @@ package com.bhimz.simpleweather
 
 import com.bhimz.simpleweather.di.appModule
 import com.bhimz.simpleweather.di.netModule
-import com.bhimz.simpleweather.domain.service.WeatherService
+import com.bhimz.simpleweather.domain.repository.WeatherRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Test
@@ -19,8 +19,8 @@ import org.koin.test.inject
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-class WeatherServiceTest: KoinTest {
-    private val weatherService: WeatherService by inject()
+class WeatherRepositoryTest: KoinTest {
+    private val weatherRepository: WeatherRepository by inject()
 
     @Before
     fun setUp() {
@@ -43,7 +43,7 @@ class WeatherServiceTest: KoinTest {
 
         runBlocking {
             //when
-            val weatherList = weatherService.getWeather(lat, lon)
+            val weatherList = weatherRepository.getWeather(lat, lon)
 
             //then
             assertTrue("weather should not be null", weatherList != null)

@@ -42,3 +42,9 @@ data class Weather(
         }
 }
 
+data class Location(
+    val locationName: String,
+    val latitude: Double,
+    val longitude: Double
+)
+
