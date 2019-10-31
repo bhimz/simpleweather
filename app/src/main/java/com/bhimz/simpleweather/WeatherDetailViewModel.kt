@@ -8,7 +8,7 @@ import com.bhimz.simpleweather.domain.model.Weather
 import com.bhimz.simpleweather.domain.repository.WeatherRepository
 import kotlinx.coroutines.launch
 
-class WeatherViewModel(private val weatherRepository: WeatherRepository) : ViewModel() {
+class WeatherDetailViewModel(private val weatherRepository: WeatherRepository) : ViewModel() {
     private val _locationName = MutableLiveData<String>().apply { value = "" }
     private val _weatherList = MutableLiveData<List<Weather>>().apply { value = listOf() }
 

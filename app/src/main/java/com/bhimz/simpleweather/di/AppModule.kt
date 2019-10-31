@@ -3,7 +3,7 @@ package com.bhimz.simpleweather.di
 import androidx.room.Room
 import com.bhimz.simpleweather.BuildConfig
 import com.bhimz.simpleweather.LocationListViewModel
-import com.bhimz.simpleweather.WeatherViewModel
+import com.bhimz.simpleweather.WeatherDetailViewModel
 import com.bhimz.simpleweather.domain.db.AppDatabase
 import com.bhimz.simpleweather.domain.net.WeatherApi
 import com.bhimz.simpleweather.domain.repository.LocationRepository
@@ -32,7 +32,7 @@ val appModule = module {
         LocationRepository(get())
     }
     viewModel {
-        WeatherViewModel(get())
+        WeatherDetailViewModel(get())
     }
     viewModel {
         LocationListViewModel(get())

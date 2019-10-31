@@ -22,7 +22,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
@@ -35,11 +34,11 @@ import org.koin.test.KoinTest
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class MainActivityTest : KoinTest {
+class WeatherActivityTest : KoinTest {
 
     @get:Rule
-    val activityRule: ActivityTestRule<MainActivity> =
-        ActivityTestRule(MainActivity::class.java, true, false)
+    val activityRule: ActivityTestRule<WeatherActivity> =
+        ActivityTestRule(WeatherActivity::class.java, true, false)
     private val dummyWeatherApi = DummyWeatherApi()
 
     @Before

@@ -12,12 +12,12 @@ import kotlinx.coroutines.withContext
 
 class LocationListViewModel(private val locationRepository: LocationRepository) : ViewModel() {
 
-    private val _weatherList = MutableLiveData<List<Location>>().apply { value = listOf() }
+    private val _locations = MutableLiveData<List<Location>>().apply { value = listOf() }
 
-    val weatherList: LiveData<List<Location>> = _weatherList
+    val locationList: LiveData<List<Location>> = _locations
 
     fun initLocations() = viewModelScope.launch {
         val locations = withContext(Dispatchers.IO) { locationRepository.getAllLocations() }
-        _weatherList.value = locations
+        _locations.value = locations
     }
 }
