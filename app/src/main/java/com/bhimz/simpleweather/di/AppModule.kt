@@ -35,7 +35,7 @@ val appModule = module {
         WeatherDetailViewModel(get())
     }
     viewModel {
-        LocationListViewModel(get())
+        LocationListViewModel(get(), get())
     }
 }
 
@@ -51,7 +51,7 @@ val netModule = module {
             .build() }
     single {
         Retrofit.Builder()
-            .baseUrl("https://samples.openweathermap.org/data/2.5/")
+            .baseUrl("https://api.openweathermap.org/data/2.5/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(get())
             .build()

@@ -15,8 +15,8 @@ class WeatherDetailViewModel(private val weatherRepository: WeatherRepository) :
     val locationName: LiveData<String> = _locationName
     val weatherList: LiveData<List<Weather>> = _weatherList
 
-    fun loadCurrentLocationWeather() = viewModelScope.launch {
-        val weatherListUpdate = weatherRepository.getWeather(35.0, 139.0) ?: listOf()
+    fun loadForecasts(latitude: Double, longitude: Double) = viewModelScope.launch {
+        val weatherListUpdate = weatherRepository.getWeatherForecast(latitude, longitude) ?: listOf()
         _weatherList.value = weatherListUpdate
     }
 }

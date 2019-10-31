@@ -11,7 +11,8 @@ import androidx.test.rule.ActivityTestRule
 import com.bhimz.simpleweather.di.appModule
 import com.bhimz.simpleweather.di.testDbModule
 import com.bhimz.simpleweather.domain.net.WeatherApi
-import com.bhimz.simpleweather.domain.model.WeatherApiResponse
+import com.bhimz.simpleweather.domain.model.ForecastResponse
+import com.bhimz.simpleweather.domain.model.WeatherResponse
 import com.google.gson.Gson
 import org.junit.After
 
@@ -283,8 +284,16 @@ class WeatherActivityTest : KoinTest {
             latitude: Double,
             longitude: Double,
             appId: String
-        ): WeatherApiResponse {
-            return Gson().fromJson(mockResponse, WeatherApiResponse::class.java)
+        ): ForecastResponse {
+            return Gson().fromJson(mockResponse, ForecastResponse::class.java)
+        }
+
+        override suspend fun getCurrentWeather(
+            latitude: Double,
+            longitude: Double,
+            appId: String
+        ): WeatherResponse {
+            return Gson().fromJson(mockResponse, WeatherResponse::class.java)
         }
 
     }

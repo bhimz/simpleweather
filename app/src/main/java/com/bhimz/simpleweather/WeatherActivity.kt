@@ -60,7 +60,7 @@ class WeatherActivity : AppCompatActivity(), CoroutineScope {
 
     override fun onStart() {
         super.onStart()
-        viewModel.loadCurrentLocationWeather()
+        viewModel.loadForecasts(35.0, 106.0)
     }
 
     class WeatherViewHolder(val binding: ViewWeatherListitemBinding) : RecyclerView.ViewHolder(binding.root)
