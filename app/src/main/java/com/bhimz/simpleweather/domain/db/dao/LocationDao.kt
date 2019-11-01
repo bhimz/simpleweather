@@ -14,4 +14,7 @@ interface LocationDao {
     @Query("select * from LocationData where location_name=:locationName")
     suspend fun getLocationData(locationName: String): LocationData?
 
+    @Query("select * from LocationData order by location_name")
+    suspend fun getAllLocations(): List<LocationData>
+
 }

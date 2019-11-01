@@ -2,7 +2,6 @@ package com.bhimz.simpleweather
 
 import com.bhimz.simpleweather.di.appModule
 import com.bhimz.simpleweather.di.netModule
-import com.bhimz.simpleweather.di.testDbModule
 import com.bhimz.simpleweather.domain.repository.WeatherRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -43,7 +42,7 @@ class WeatherRepositoryTest: KoinTest {
 
         runBlocking {
             //when
-            val weatherList = weatherRepository.getWeather(lat, lon)
+            val weatherList = weatherRepository.getWeatherForecast(lat, lon)
 
             //then
             assertTrue("weather should not be null", weatherList != null)

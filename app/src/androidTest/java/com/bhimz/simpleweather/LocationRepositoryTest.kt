@@ -16,15 +16,14 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.inject
-import java.lang.Exception
 import org.junit.Assert.*
 import org.junit.runner.RunWith
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.context.loadKoinModules
+import kotlin.Exception
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class LocationRepositoryTest: KoinTest {
+class LocationRepositoryTest : KoinTest {
     private val locationRepository: LocationRepository by inject()
     private val locationDao: LocationDao by inject()
 
@@ -56,7 +55,11 @@ class LocationRepositoryTest: KoinTest {
                 locationRepository.saveLocation(location)
                 val savedLocationData = locationDao.getLocationData(locationName)
                 assertTrue("saved location should not be null", savedLocationData != null)
-                assertEquals("location name should match", locationName, savedLocationData!!.locationName)
+                assertEquals(
+                    "location name should match",
+                    locationName,
+                    savedLocationData!!.locationName
+                )
                 assertEquals("latitude should match", lat, savedLocationData.latitude, 0.0001)
                 assertEquals("longitude should match", lon, savedLocationData.longitude, 0.0001)
             } catch (e: Exception) {
@@ -84,13 +87,74 @@ class LocationRepositoryTest: KoinTest {
 
                 val savedLocationData = locationDao.getLocationData(locationName)
                 assertTrue("saved location should not be null", savedLocationData != null)
-                assertEquals("location name should match", locationName, savedLocationData!!.locationName)
+                assertEquals(
+                    "location name should match",
+                    locationName,
+                    savedLocationData!!.locationName
+                )
                 assertEquals("latitude should match", newLat, savedLocationData.latitude, 0.0001)
                 assertEquals("longitude should match", newLon, savedLocationData.longitude, 0.0001)
             } catch (e: Exception) {
                 e.printStackTrace()
                 fail("should have no error, but received: ${e.message}")
             }
+        }
+    }
+
+    @Test
+    fun testGetAllLocations() {
+        //given
+        val locations = listOf(
+            Location("Jakarta", -6.1, 106.5),
+            Location("Bandung", -6.4, 106.8),
+            Location("Surabaya", -5.4, 103.8)
+        )
+        runBlocking {
+            try {
+                locations.forEach {
+                    locationRepository.saveLocation(it)
+                }
+
+                //when
+                val savedLocations = locationRepository.getAllLocations()
+
+                //then
+                assertEquals(
+                    "saved locations size should match given",
+                    locations.size,
+                    savedLocations.size
+                )
+                val sortedLocations = locations.toMutableList().sortedBy { it.locationName }
+                sortedLocations.forEach { location ->
+                    val savedLocation =
+                        savedLocations.find { it.locationName == location.locationName }
+                    assertTrue(
+                        "should contain saved location-${location.locationName}",
+                        savedLocation != null
+                    )
+                    assertEquals(
+                        "saved location-${location.locationName} location name should match",
+                        location.locationName,
+                        savedLocation!!.locationName
+                    )
+                    assertEquals(
+                        "saved location-${location.locationName} latitude should match",
+                        location.latitude,
+                        savedLocation.latitude,
+                        0.0001
+                    )
+                    assertEquals(
+                        "saved location-${location.locationName} longitude should match",
+                        location.longitude,
+                        savedLocation.longitude,
+                        0.0001
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                fail("should have no error, but received: ${e.message}")
+            }
+
         }
     }
 }

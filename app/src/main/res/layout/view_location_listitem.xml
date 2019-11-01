@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="location"
+            type="com.bhimz.simpleweather.domain.model.Location" />
+        <variable
+            name="clickListener"
+            type="com.bhimz.simpleweather.domain.action.OnLocationClickListener" />
+    </data>
+    <LinearLayout
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="@{() -> clickListener.onClick(location)}">
+        <TextView
+            android:id="@+id/locationNameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{location.locationName}"/>
+    </LinearLayout>
+</layout>

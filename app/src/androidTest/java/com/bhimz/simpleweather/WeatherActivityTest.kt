@@ -6,11 +6,13 @@ import androidx.test.espresso.assertion.ViewAssertions.*
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import com.bhimz.simpleweather.di.appModule
 import com.bhimz.simpleweather.di.testDbModule
 import com.bhimz.simpleweather.domain.net.WeatherApi
-import com.bhimz.simpleweather.domain.model.WeatherApiResponse
+import com.bhimz.simpleweather.domain.model.ForecastResponse
+import com.bhimz.simpleweather.domain.model.WeatherResponse
 import com.google.gson.Gson
 import org.junit.After
 
@@ -20,7 +22,8 @@ import org.junit.runner.RunWith
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
-import org.koin.core.context.loadKoinModules
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
@@ -32,22 +35,24 @@ import org.koin.test.KoinTest
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class MainActivityTest : KoinTest {
+class WeatherActivityTest : KoinTest {
 
     @get:Rule
-    val activityRule: ActivityTestRule<MainActivity> =
-        ActivityTestRule(MainActivity::class.java, true, false)
+    val activityRule: ActivityTestRule<WeatherActivity> =
+        ActivityTestRule(WeatherActivity::class.java, true, false)
     private val dummyWeatherApi = DummyWeatherApi()
 
     @Before
     fun setUp() {
-        loadKoinModules(
-            listOf(appModule, module {
+        stopKoin()
+        startKoin {
+            androidContext(InstrumentationRegistry.getInstrumentation().context)
+            modules(listOf(appModule, module {
                 single<WeatherApi> {
                     dummyWeatherApi
                 }
-            }, testDbModule)
-        )
+            }, testDbModule))
+        }
     }
 
     @After
@@ -279,8 +284,16 @@ class MainActivityTest : KoinTest {
             latitude: Double,
             longitude: Double,
             appId: String
-        ): WeatherApiResponse {
-            return Gson().fromJson(mockResponse, WeatherApiResponse::class.java)
+        ): ForecastResponse {
+            return Gson().fromJson(mockResponse, ForecastResponse::class.java)
+        }
+
+        override suspend fun getCurrentWeather(
+            latitude: Double,
+            longitude: Double,
+            appId: String
+        ): WeatherResponse {
+            return Gson().fromJson(mockResponse, WeatherResponse::class.java)
         }
 
     }
