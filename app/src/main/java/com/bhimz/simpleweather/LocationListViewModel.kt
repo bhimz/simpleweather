@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bhimz.simpleweather.domain.model.Location
 import com.bhimz.simpleweather.domain.repository.LocationRepository
+import com.bhimz.simpleweather.util.PlaceUtil
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
@@ -18,7 +19,7 @@ import kotlin.coroutines.resumeWithException
 
 class LocationListViewModel(
     private val locationRepository: LocationRepository,
-    private val placesClient: PlacesClient
+    private val placeUtil: PlaceUtil
 ) : ViewModel() {
 
     private val _locations = MutableLiveData<List<Location>>().apply { value = listOf() }
@@ -26,27 +27,7 @@ class LocationListViewModel(
     val locationList: LiveData<List<Location>> = _locations
 
     fun initLocations() = viewModelScope.launch {
-        val placeRequest =
-            FindCurrentPlaceRequest.newInstance(listOf(Place.Field.ADDRESS, Place.Field.LAT_LNG))
-        val currentLocation = suspendCancellableCoroutine<Location?> { cont ->
-            placesClient.findCurrentPlace(placeRequest).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val placesLikelihood = task.result?.placeLikelihoods
-                    if (!placesLikelihood.isNullOrEmpty() && placesLikelihood[0].place.latLng != null) {
-                        val closest = placesLikelihood[0].place
-                        val locationName = closest.address ?: ""
-                        val latLng = closest.latLng
-                        val latitude = latLng!!.latitude
-                        val longitude = latLng.longitude
-                        cont.resume(Location(locationName, latitude, longitude))
-                    } else {
-                        cont.resume(null)
-                    }
-                } else {
-                    cont.resumeWithException(task.exception ?: Exception("cannot get location"))
-                }
-            }
-        }
+        val currentLocation = placeUtil.findCurrentPlace()
         val locations = (currentLocation?.let { listOf(it) }
             ?: listOf()) + withContext(Dispatchers.IO) { locationRepository.getAllLocations() }
         _locations.value = locations

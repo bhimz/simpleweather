@@ -8,6 +8,8 @@ import com.bhimz.simpleweather.domain.db.AppDatabase
 import com.bhimz.simpleweather.domain.net.WeatherApi
 import com.bhimz.simpleweather.domain.repository.LocationRepository
 import com.bhimz.simpleweather.domain.repository.WeatherRepository
+import com.bhimz.simpleweather.util.PlaceUtil
+import com.bhimz.simpleweather.util.PlaceUtilImpl
 import com.google.android.libraries.places.api.Places
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -19,11 +21,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 val appModule = module {
-    single {
-        val ctx = androidContext()
-        Places.initialize(ctx, BuildConfig.PLACES_API_KEY)
-        Places.createClient(ctx)
-    }
     single { get<AppDatabase>().locationDao() }
     factory {
         WeatherRepository(get())
@@ -37,6 +34,16 @@ val appModule = module {
     viewModel {
         LocationListViewModel(get(), get())
     }
+}
+
+val utilModule = module {
+    single {
+        val ctx = androidContext()
+        Places.initialize(ctx, BuildConfig.PLACES_API_KEY)
+        Places.createClient(ctx)
+    }
+
+    single<PlaceUtil> { PlaceUtilImpl(get()) }
 }
 
 val netModule = module {
