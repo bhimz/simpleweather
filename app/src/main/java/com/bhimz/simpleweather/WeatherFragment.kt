@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,7 +23,7 @@ import org.koin.android.ext.android.inject
 class WeatherFragment : Fragment() {
     private val permissionRequestCode = 1001
 
-    private val viewModel: LocationListViewModel by inject()
+    private val viewModel: LocationListViewModel by activityViewModels()
 
     private var locationList: List<Location> = listOf()
 

@@ -32,7 +32,7 @@ val appModule = module {
         WeatherDetailViewModel(get())
     }
     viewModel {
-        LocationListViewModel(get(), get())
+        LocationListViewModel()
     }
 }
 

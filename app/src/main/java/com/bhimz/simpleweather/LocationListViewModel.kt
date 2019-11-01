@@ -14,13 +14,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class LocationListViewModel(
-    private val locationRepository: LocationRepository,
-    private val placeUtil: PlaceUtil
-) : ViewModel() {
+class LocationListViewModel : ViewModel(), KoinComponent {
+    private val locationRepository: LocationRepository by inject()
+    private val placeUtil: PlaceUtil by inject()
 
     private val _locations = MutableLiveData<List<Location>>().apply { value = listOf() }
 
