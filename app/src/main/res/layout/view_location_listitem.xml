@@ -32,13 +32,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{location.locationName}"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                android:textColor="@android:color/black"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
-                tools:text="@tools:sample/cities" />
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="@sample/location_item_list.json/data/location_name" />
 
             <ImageView
                 android:id="@+id/weatherIconView"
@@ -57,22 +57,22 @@
                 android:id="@+id/weatherConditionText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                tools:text="Clear"
                 android:text="@{location.currentWeather}"
+                android:textSize="18sp"
+                app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/locationNameText"
-                app:layout_constraintLeft_toLeftOf="parent"/>
+                tools:text="@sample/location_item_list.json/data/weather_condition" />
 
             <TextView
                 android:id="@+id/temperatureText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@{String.format(@string/temperature_text, location.temperature - 273.15)}"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                tools:text="9.69  ° C"
-                android:text="@{String.format(@string/temperature_text, location.temperature - 273.15)}"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/weatherConditionText"/>
+                app:layout_constraintTop_toBottomOf="@+id/weatherConditionText"
+                tools:text="@sample/location_item_list.json/data/temperature" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
