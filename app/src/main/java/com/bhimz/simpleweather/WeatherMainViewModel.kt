@@ -19,7 +19,7 @@ import org.koin.core.inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class LocationListViewModel : ViewModel(), KoinComponent {
+class WeatherMainViewModel : ViewModel(), KoinComponent {
     private val locationRepository: LocationRepository by inject()
     private val placeUtil: PlaceUtil by inject()
 

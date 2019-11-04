@@ -5,7 +5,5 @@ import org.junit.runners.Suite
 
 @RunWith(Suite::class)
 @Suite.SuiteClasses(
-    LocationRepositoryTest::class,
-    WeatherActivityTest::class,
-    LocationListActivityTest::class)
+    LocationRepositoryTest::class)
 class AppTestSuite

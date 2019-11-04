@@ -18,12 +18,11 @@ import com.bhimz.simpleweather.databinding.FragmentWeatherBinding
 import com.bhimz.simpleweather.databinding.ViewLocationListitemBinding
 import com.bhimz.simpleweather.domain.action.OnLocationClickListener
 import com.bhimz.simpleweather.domain.model.Location
-import org.koin.android.ext.android.inject
 
 class WeatherFragment : Fragment() {
     private val permissionRequestCode = 1001
 
-    private val viewModel: LocationListViewModel by activityViewModels()
+    private val viewModel: WeatherMainViewModel by activityViewModels()
 
     private var locationList: List<Location> = listOf()
 
