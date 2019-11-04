@@ -10,42 +10,70 @@
             name="clickListener"
             type="com.bhimz.simpleweather.domain.action.OnLocationClickListener" />
     </data>
-    <androidx.constraintlayout.widget.ConstraintLayout
+
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        android:onClick="@{() -> clickListener.onClick(location)}"
+        >
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp">
 
-        <TextView
-            android:id="@+id/locationNameText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{location.locationName}"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="@tools:sample/cities" />
-        <ImageView
-            android:id="@+id/weatherIconView"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:scaleType="matrix"
-            app:imageUrl="@{location.weatherIconUrl}"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toRightOf="@+id/locationNameText"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
-        <TextView
-            android:id="@+id/weatherConditionText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{location.currentWeather}"
-            app:layout_constraintTop_toBottomOf="@+id/locationNameText"
-            app:layout_constraintLeft_toLeftOf="parent"/>
+            <TextView
+                android:id="@+id/locationNameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{location.locationName}"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                tools:text="@tools:sample/cities" />
 
-        <TextView
-            android:id="@+id/temperatureText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{String.format(@string/temperature_text, location.temperature - 273.15)}"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/weatherConditionText"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageView
+                android:id="@+id/weatherIconView"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:scaleType="matrix"
+                app:imageUrl="@{location.weatherIconUrl}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintHorizontal_chainStyle="spread_inside"
+                app:layout_constraintLeft_toRightOf="@+id/locationNameText"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <TextView
+                android:id="@+id/weatherConditionText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                tools:text="Clear"
+                android:text="@{location.currentWeather}"
+                app:layout_constraintTop_toBottomOf="@+id/locationNameText"
+                app:layout_constraintLeft_toLeftOf="parent"/>
+
+            <TextView
+                android:id="@+id/temperatureText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="9.69  ° C"
+                android:text="@{String.format(@string/temperature_text, location.temperature - 273.15)}"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/weatherConditionText"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
 </layout>
