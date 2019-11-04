@@ -1,7 +1,7 @@
 package com.bhimz.simpleweather.domain.action
 
-import com.bhimz.simpleweather.domain.model.Location
+import com.bhimz.simpleweather.domain.model.LocationBindingModel
 
 interface OnLocationClickListener {
-    fun onClick(location: Location)
+    fun onClick(location: LocationBindingModel)
 }

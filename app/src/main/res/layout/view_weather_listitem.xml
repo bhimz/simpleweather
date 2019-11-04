@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
             name="weather"
@@ -15,19 +16,19 @@
             android:id="@+id/forecastDateText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{weather.dateText}"
-            />
+            app:dateInMillis="@{weather.date}"
+            app:dateFormat="@{`MMM dd HH:mm`}" />
 
         <TextView
             android:id="@+id/weatherText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{weather.weather}"/>
+            android:text="@{weather.name}"/>
 
         <TextView
             android:id="@+id/temperatureText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{weather.temperatureText}"/>
+            android:text="@{String.format(@string/temperature_text, weather.temperature - 273.15)}"/>
     </LinearLayout>
 </layout>

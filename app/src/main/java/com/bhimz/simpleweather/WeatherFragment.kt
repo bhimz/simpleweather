@@ -17,14 +17,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bhimz.simpleweather.databinding.FragmentWeatherBinding
 import com.bhimz.simpleweather.databinding.ViewLocationListitemBinding
 import com.bhimz.simpleweather.domain.action.OnLocationClickListener
-import com.bhimz.simpleweather.domain.model.Location
+import com.bhimz.simpleweather.domain.model.LocationBindingModel
 
 class WeatherFragment : Fragment() {
     private val permissionRequestCode = 1001
 
     private val viewModel: WeatherMainViewModel by activityViewModels()
 
-    private var locationList: List<Location> = listOf()
+    private var locationList: List<LocationBindingModel> = listOf()
 
     private val locationAdapter = object : RecyclerView.Adapter<LocationViewHolder>() {
         override fun onBindViewHolder(holder: LocationViewHolder, position: Int) {
@@ -107,7 +107,7 @@ class WeatherFragment : Fragment() {
         }
     }
 
-    private fun onUpdateLocationList(locations: List<Location>?) {
+    private fun onUpdateLocationList(locations: List<LocationBindingModel>?) {
         locations ?: return
         this.locationList = locations
         locationAdapter.notifyDataSetChanged()
@@ -116,9 +116,9 @@ class WeatherFragment : Fragment() {
     class LocationViewHolder(val binding: ViewLocationListitemBinding) :
         RecyclerView.ViewHolder(binding.root)
 
-    fun ViewLocationListitemBinding.setOnLocationClickListener(block: (Location) -> Unit) {
+    fun ViewLocationListitemBinding.setOnLocationClickListener(block: (LocationBindingModel) -> Unit) {
         clickListener = object : OnLocationClickListener {
-            override fun onClick(location: Location) {
+            override fun onClick(location: LocationBindingModel) {
                 block(location)
 
             }

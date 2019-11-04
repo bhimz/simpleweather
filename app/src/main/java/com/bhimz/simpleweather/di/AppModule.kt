@@ -69,7 +69,7 @@ val netModule = module {
 }
 
 val dbModule = module {
-    single { Room.databaseBuilder(get(), AppDatabase::class.java, "weather-db").build() }
+    single { Room.databaseBuilder(get(), AppDatabase::class.java, "name-db").build() }
 }
 
 val testDbModule = module {
