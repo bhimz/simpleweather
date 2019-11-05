@@ -39,7 +39,10 @@ class WeatherFragment : Fragment() {
                         val action = WeatherFragmentDirections.actionOpenWeatherDetail(
                             location.locationName,
                             location.latitude.toFloat(),
-                            location.longitude.toFloat()
+                            location.longitude.toFloat(),
+                            location.weatherIconUrl ?: "",
+                            location.currentWeather,
+                            location.temperature.toFloat()
                         )
                         this@WeatherFragment.findNavController().navigate(action)
                     }
@@ -60,7 +63,8 @@ class WeatherFragment : Fragment() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             return when (viewType) {
                 HEADER_VIEW -> {
-                    val view = LayoutInflater.from(parent.context).inflate(R.layout.view_location_listheader, parent, false)
+                    val view = LayoutInflater.from(parent.context)
+                        .inflate(R.layout.view_location_listheader, parent, false)
                     HeaderViewModel(view)
                 }
                 else -> {

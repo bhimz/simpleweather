@@ -1,18 +1,92 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="location"
+            type="com.bhimz.simpleweather.domain.model.LocationBindingModel" />
+    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/primaryLightColor">
+
+        <View
+            android:id="@+id/headerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/primaryColor"
+            app:layout_constraintBottom_toBottomOf="@id/temperatureText"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/locationNameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="20dp"
+            android:text="@{location.locationName}"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@sample/location_item_list.json/data/location_name" />
+
+        <ImageView
+            android:id="@+id/weatherIconView"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:contentDescription="@string/weather_icon"
+            android:scaleType="matrix"
+            app:imageUrl="@{location.weatherIconUrl}"
+            app:layout_constraintBottom_toBottomOf="@+id/temperatureText"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintLeft_toRightOf="@+id/locationNameText"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/weatherConditionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:text="@{location.currentWeather}"
+            android:textSize="18sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/locationNameText"
+            tools:text="@sample/location_item_list.json/data/weather_condition" />
+
+        <TextView
+            android:id="@+id/temperatureText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="4dp"
+            android:paddingBottom="20dp"
+            android:text="@{String.format(@string/temperature_text, location.temperature - 273.15)}"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/weatherConditionText"
+            tools:text="@sample/location_item_list.json/data/temperature" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/weatherListView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/headerView"
+            tools:listitem="@layout/view_weather_listitem" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

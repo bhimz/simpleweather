@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bhimz.simpleweather.databinding.FragmentWeatherDetailBinding
 import com.bhimz.simpleweather.databinding.ViewWeatherListitemBinding
+import com.bhimz.simpleweather.domain.model.LocationBindingModel
 import com.bhimz.simpleweather.domain.model.Weather
 import org.koin.android.ext.android.inject
 
@@ -23,6 +24,9 @@ class WeatherDetailFragment : Fragment() {
     private val locationName by lazy { args.locationName }
     private val latitude by lazy { args.latitude.toDouble() }
     private val longitude by lazy { args.longitude.toDouble() }
+    private val weatherCondition by lazy { args.weatherCondition }
+    private val weatherIconUrl by lazy { args.weatherIconUrl }
+    private val temperature by lazy { args.temperature.toDouble() }
 
     private var weatherList = listOf<Weather>()
 
@@ -56,6 +60,14 @@ class WeatherDetailFragment : Fragment() {
                 container,
                 false
             )
+        )
+        binding.location = LocationBindingModel(
+            locationName,
+            latitude,
+            longitude,
+            weatherCondition,
+            weatherIconUrl,
+            temperature
         )
         val weatherListView = binding.weatherListView
         weatherListView.layoutManager = LinearLayoutManager(context)

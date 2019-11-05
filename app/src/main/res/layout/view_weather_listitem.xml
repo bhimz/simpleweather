@@ -1,34 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable
             name="weather"
             type="com.bhimz.simpleweather.domain.model.Weather" />
     </data>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/forecastDateText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="0dp"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:dateFormat="@{`MMM dd HH:mm`}"
             app:dateInMillis="@{weather.date}"
-            app:dateFormat="@{`MMM dd HH:mm`}" />
+            app:layout_constraintEnd_toStartOf="@+id/weatherText"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Jan 01 12:00" />
 
         <TextView
             android:id="@+id/weatherText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{weather.name}"/>
+            android:text="@{weather.name}"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            app:layout_constraintBaseline_toBaselineOf="@id/forecastDateText"
+            app:layout_constraintEnd_toStartOf="@+id/temperatureText"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/forecastDateText"
+            tools:text="Cloudy" />
 
         <TextView
             android:id="@+id/temperatureText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{String.format(@string/temperature_text, weather.temperature - 273.15)}"/>
-    </LinearLayout>
+            android:paddingStart="0dp"
+            android:paddingEnd="16dp"
+            android:text="@{String.format(@string/temperature_text, weather.temperature - 273.15)}"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBaseline_toBaselineOf="@id/forecastDateText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/weatherText"
+            tools:text="10.69  ° C" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/primaryColor"
+            app:layout_constraintLeft_toLeftOf="@+id/forecastDateText"
+            app:layout_constraintRight_toRightOf="@id/temperatureText"
+            app:layout_constraintTop_toBottomOf="@id/weatherText"
+            android:alpha="0.6"
+            android:layout_marginTop="8dp"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
