@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Simple Weather App</string>
     <string name="temperature_text">%,.2f ° C</string>
+    <string name="weather_icon">weather_icon</string>
 </resources>

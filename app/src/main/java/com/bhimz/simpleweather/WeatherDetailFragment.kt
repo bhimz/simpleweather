@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
@@ -14,6 +15,7 @@ import com.bhimz.simpleweather.databinding.FragmentWeatherDetailBinding
 import com.bhimz.simpleweather.databinding.ViewWeatherListitemBinding
 import com.bhimz.simpleweather.domain.model.Weather
 import org.koin.android.ext.android.inject
+
 
 class WeatherDetailFragment : Fragment() {
 
