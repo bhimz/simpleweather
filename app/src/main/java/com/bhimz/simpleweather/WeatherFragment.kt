@@ -19,9 +19,9 @@ import com.bhimz.simpleweather.databinding.FragmentWeatherBinding
 import com.bhimz.simpleweather.databinding.ViewLocationListitemBinding
 import com.bhimz.simpleweather.domain.action.OnLocationClickListener
 import com.bhimz.simpleweather.domain.model.LocationBindingModel
-
-const val HEADER_VIEW = 0
-const val ITEM_VIEW = 1
+import com.bhimz.simpleweather.util.HEADER_VIEW
+import com.bhimz.simpleweather.util.ITEM_VIEW
+import com.bhimz.simpleweather.util.ListItemModel
 
 class WeatherFragment : Fragment() {
     private val permissionRequestCode = 1001
@@ -153,11 +153,6 @@ class WeatherFragment : Fragment() {
 
     class HeaderViewModel(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val headerTitleText: TextView = itemView.findViewById(R.id.headerTitleText)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    data class ListItemModel(val viewType: Int, private val data: Any) {
-        fun <T> itemData(): T = data as T
     }
 
     fun ViewLocationListitemBinding.setOnLocationClickListener(block: (LocationBindingModel) -> Unit) {

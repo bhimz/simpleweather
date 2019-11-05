@@ -14,8 +14,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bhimz.simpleweather.databinding.FragmentWeatherDetailBinding
 import com.bhimz.simpleweather.databinding.ViewWeatherListitemBinding
 import com.bhimz.simpleweather.domain.model.LocationBindingModel
-import com.bhimz.simpleweather.domain.model.Weather
+import com.bhimz.simpleweather.domain.model.WeatherBindingModel
+import com.bhimz.simpleweather.util.HEADER_VIEW
+import com.bhimz.simpleweather.util.ITEM_VIEW
+import com.bhimz.simpleweather.util.ListItemModel
 import org.koin.android.ext.android.inject
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class WeatherDetailFragment : Fragment() {
@@ -28,24 +33,43 @@ class WeatherDetailFragment : Fragment() {
     private val weatherIconUrl by lazy { args.weatherIconUrl }
     private val temperature by lazy { args.temperature.toDouble() }
 
-    private var weatherList = listOf<Weather>()
+    private var itemList = listOf<ListItemModel>()
 
     private val viewModel: WeatherDetailViewModel by inject()
 
-    private val weatherAdapter = object : RecyclerView.Adapter<WeatherViewHolder>() {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeatherViewHolder {
-            val binding = DataBindingUtil.inflate<ViewWeatherListitemBinding>(
-                LayoutInflater.from(parent.context),
-                R.layout.view_weather_listitem, parent,
-                false
-            )
-            return WeatherViewHolder(binding)
+    private val weatherAdapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+            return when (viewType) {
+                HEADER_VIEW -> {
+                    val view = LayoutInflater.from(parent.context)
+                        .inflate(R.layout.view_weather_listheader, parent, false)
+                    HeaderViewModel(view)
+                }
+                else -> {
+                    val binding = DataBindingUtil.inflate<ViewWeatherListitemBinding>(
+                        LayoutInflater.from(parent.context),
+                        R.layout.view_weather_listitem, parent,
+                        false
+                    )
+                    WeatherViewHolder(binding)
+                }
+            }
+
         }
 
-        override fun getItemCount(): Int = weatherList.size
+        override fun getItemViewType(position: Int): Int = itemList[position].viewType
 
-        override fun onBindViewHolder(holder: WeatherViewHolder, position: Int) {
-            holder.binding.weather = weatherList[position]
+        override fun getItemCount(): Int = itemList.size
+
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            when (holder) {
+                is WeatherViewHolder -> {
+                    holder.binding.weather = itemList[position].itemData()
+                }
+                is HeaderViewModel -> {
+                    holder.headerTitleText.text = itemList[position].itemData()
+                }
+            }
         }
 
     }
@@ -81,12 +105,27 @@ class WeatherDetailFragment : Fragment() {
         viewModel.loadForecasts(latitude, longitude)
     }
 
-    private fun onWeatherListUpdated(weatherList: List<Weather>?) {
+    private fun onWeatherListUpdated(weatherList: List<WeatherBindingModel>?) {
         weatherList ?: return
-        this.weatherList = weatherList
+        val items = mutableListOf<ListItemModel>()
+        val headerFormat = SimpleDateFormat("MMM dd", Locale.US)
+        var prevHeaderText = ""
+        weatherList.forEach { weather ->
+            val headerText = headerFormat.format(Date(weather.date * 1000))
+            if (prevHeaderText != headerText) {
+                items.add(ListItemModel(HEADER_VIEW, headerText))
+                prevHeaderText = headerText
+            }
+            items.add(ListItemModel(ITEM_VIEW, weather))
+        }
+        this.itemList = items
         weatherAdapter.notifyDataSetChanged()
     }
 
     class WeatherViewHolder(val binding: ViewWeatherListitemBinding) :
         RecyclerView.ViewHolder(binding.root)
+
+    class HeaderViewModel(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val headerTitleText: TextView = itemView.findViewById(R.id.headerTitleText)
+    }
 }

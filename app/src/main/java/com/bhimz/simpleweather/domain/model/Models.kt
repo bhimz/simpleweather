@@ -22,3 +22,10 @@ data class LocationBindingModel(
     var temperature: Double = 0.0
 )
 
+data class WeatherBindingModel(
+    val date: Long,
+    val name: String,
+    val temperature: Double,
+    val weatherIconUrl: String? = null
+)
+
