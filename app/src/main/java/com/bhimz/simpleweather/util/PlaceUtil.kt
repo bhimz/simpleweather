@@ -16,8 +16,8 @@ interface PlaceUtil {
 class PlaceUtilImpl(private val placesClient: PlacesClient) : PlaceUtil {
     override suspend fun findCurrentPlace(): Location? {
         val placeRequest =
-            FindCurrentPlaceRequest.newInstance(listOf(Place.Field.ID))
-        val placeId = suspendCancellableCoroutine<String?> { cont ->
+            FindCurrentPlaceRequest.newInstance(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
+        val place = suspendCancellableCoroutine<Place?> { cont ->
             placesClient.findCurrentPlace(placeRequest).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     if (task.result == null) {
@@ -31,63 +31,21 @@ class PlaceUtilImpl(private val placesClient: PlacesClient) : PlaceUtil {
 
                     }
                     val match = matches.toMutableList().apply { sortByDescending { it.likelihood } }[0]
-                    cont.resume(match.place.id)
-                    /*val placesLikelihood = task.result?.placeLikelihoods
-                    if (!placesLikelihood.isNullOrEmpty() && placesLikelihood[0].place.latLng != null) {
-                        val closest = placesLikelihood[0].place
-                        var locationName = ""
-                        closest.addressComponents?.asList()?.forEach {
-                          if (it.types.contains("administrative_area_level_1")) locationName = it.name
-                        }
-                        //val locationName = closest.address ?: ""
-                        val latLng = closest.latLng
-                        val latitude = latLng!!.latitude
-                        val longitude = latLng.longitude
-                        cont.resume(Location(locationName, latitude, longitude))
-                    } else {
-                        cont.resume(null)
-                    }*/
+                    cont.resume(match.place)
                 } else {
                     cont.resumeWithException(task.exception ?: Exception("cannot get location"))
                 }
             }
         }
-        return placeId?.let {
-            getLocationById(it)
+        return place?.let {
+            val latLng = it.latLng
+            val name = it.name
+            if (latLng == null || name == null) {
+                null
+            } else {
+                Location(name, latLng.latitude, latLng.longitude)
+            }
         }
     }
-
-    private suspend fun getLocationById(placeId: String): Location? =
-        suspendCancellableCoroutine { cont ->
-            val request = FetchPlaceRequest.newInstance(
-                placeId,
-                listOf(Place.Field.LAT_LNG, Place.Field.ADDRESS_COMPONENTS)
-            )
-            placesClient.fetchPlace(request).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    if (task.result == null) {
-                        cont.resume(null)
-                        return@addOnCompleteListener
-                    }
-                    val place = task.result!!.place
-                    val latLng = place.latLng
-                    val addressComponents = place.addressComponents
-                    if (latLng == null || addressComponents == null) {
-                        cont.resume(null)
-                        return@addOnCompleteListener
-                    } else {
-                        var locationName = ""
-                        addressComponents.asList().forEach {
-                            if (it.types.contains("administrative_area_level_2")) locationName = it.shortName ?: it.name
-                        }
-                        cont.resume(
-                            Location(locationName, latLng.latitude, latLng.longitude)
-                        )
-                    }
-                } else {
-                    cont.resumeWithException(task.exception ?: Exception("cannot get location"))
-                }
-            }
-        }
 
 }

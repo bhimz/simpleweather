@@ -1,6 +1,8 @@
 package com.bhimz.simpleweather
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -22,9 +24,15 @@ import com.bhimz.simpleweather.domain.model.LocationBindingModel
 import com.bhimz.simpleweather.util.HEADER_VIEW
 import com.bhimz.simpleweather.util.ITEM_VIEW
 import com.bhimz.simpleweather.util.ListItemModel
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.widget.Autocomplete
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
+import com.bhimz.simpleweather.domain.model.Location
+
 
 class WeatherFragment : Fragment() {
     private val permissionRequestCode = 1001
+    private val placeAutoCompleteRequestCode = 1002
 
     private val viewModel: WeatherMainViewModel by activityViewModels()
 
@@ -94,6 +102,15 @@ class WeatherFragment : Fragment() {
         val recyclerView = binding.locationListView
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = locationAdapter
+        val fabAdd = binding.fabAdd
+        fabAdd.setOnClickListener {
+            val context = context ?: return@setOnClickListener
+            val intent = Autocomplete.IntentBuilder(
+                AutocompleteActivityMode.FULLSCREEN,
+                listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)
+            ).build(context)
+            startActivityForResult(intent, placeAutoCompleteRequestCode)
+        }
         return binding.root
     }
 
@@ -124,6 +141,20 @@ class WeatherFragment : Fragment() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            placeAutoCompleteRequestCode -> if (resultCode == Activity.RESULT_OK && data != null) {
+                val place = Autocomplete.getPlaceFromIntent(data)
+                val placeName = place.name
+                val latLng = place.latLng
+                if (placeName != null && latLng != null) {
+                    viewModel.addNewLocation(Location(placeName, latLng.latitude, latLng.longitude))
+                }
+            }
+        }
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -139,7 +170,7 @@ class WeatherFragment : Fragment() {
         locations ?: return
         val items = mutableListOf(ListItemModel(HEADER_VIEW, "Current Location"))
         locations.forEachIndexed { index, model ->
-            if (index == 2) {
+            if (index == 1) {
                 items.add(ListItemModel(HEADER_VIEW, "Saved Locations"))
             }
             items.add(ListItemModel(ITEM_VIEW, model))

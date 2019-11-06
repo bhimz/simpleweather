@@ -31,9 +31,7 @@ class WeatherMainViewModel : ViewModel(), KoinComponent {
     val locationList: LiveData<List<LocationBindingModel>> = _locations
 
     fun initLocations() = viewModelScope.launch {
-        val currentLocation = placeUtil.findCurrentPlace()?.let {
-            LocationBindingModel(it.locationName, it.latitude, it.longitude)
-        }
+        val currentLocation = getCurrentLocation()
         val locations = (currentLocation?.let { listOf(it) }
             ?: listOf()) + withContext(Dispatchers.IO) {
             locationRepository.getAllLocations().map {
@@ -51,6 +49,21 @@ class WeatherMainViewModel : ViewModel(), KoinComponent {
             }
         }
         _locations.value = updatedLocation
+    }
+
+    private suspend fun getCurrentLocation() = placeUtil.findCurrentPlace()?.let {
+        LocationBindingModel(it.locationName, it.latitude, it.longitude)
+    }
+
+    fun addNewLocation(location: Location) = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            locationRepository.saveLocation(location)
+        }
+        val bindingModel = LocationBindingModel(location.locationName, location.latitude, location.longitude)
+        val locationUpdate = _locations.value?.let {
+            it + bindingModel
+        } ?: listOf(bindingModel)
+        _locations.value = locationUpdate
     }
 
     private suspend fun updateWeather(location: LocationBindingModel): LocationBindingModel {
