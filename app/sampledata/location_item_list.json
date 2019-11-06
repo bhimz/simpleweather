@@ -1,0 +1,34 @@
+{
+  "data": [
+    {
+      "location_name": "Jakarta",
+      "weather_condition": "Sunny",
+      "temperature": "30.69  ° C"
+    },
+    {
+      "location_name": "Surabaya",
+      "weather_condition": "Sunny",
+      "temperature": "28.69  ° C"
+    },
+    {
+      "location_name": "Glasgow",
+      "weather_condition": "Cloudy",
+      "temperature": "10.69  ° C"
+    },
+    {
+      "location_name": "London",
+      "weather_condition": "Rainy",
+      "temperature": "12.69  ° C"
+    },
+    {
+      "location_name": "California",
+      "weather_condition": "Clear",
+      "temperature": "38.69  ° C"
+    },
+    {
+      "location_name": "Ukraine",
+      "weather_condition": "Sunny",
+      "temperature": "30.69  ° C"
+    }
+  ]
+}

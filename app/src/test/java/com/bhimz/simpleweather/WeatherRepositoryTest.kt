@@ -45,7 +45,7 @@ class WeatherRepositoryTest: KoinTest {
             val weatherList = weatherRepository.getWeatherForecast(lat, lon)
 
             //then
-            assertTrue("weather should not be null", weatherList != null)
+            assertTrue("name should not be null", weatherList != null)
             assertTrue("list should not be empty", weatherList!!.isNotEmpty())
         }
 

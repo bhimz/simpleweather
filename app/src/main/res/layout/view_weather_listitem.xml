@@ -1,33 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
-    <data>
-        <variable
-            name="weather"
-            type="com.bhimz.simpleweather.domain.model.Weather" />
-    </data>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/forecastDateText"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="8dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="0dp"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="12:00" />
 
-        <TextView
-            android:id="@+id/forecastDateText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{weather.dateText}"
-            />
+    <ImageView
+        android:id="@+id/weatherIconView"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:contentDescription="@string/weather_icon"
+        android:scaleType="matrix"
+        app:layout_constraintBottom_toTopOf="@id/separator"
+        app:layout_constraintEnd_toStartOf="@+id/weatherText"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/forecastDateText"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="@color/primaryDarkColor" />
 
-        <TextView
-            android:id="@+id/weatherText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{weather.weather}"/>
+    <TextView
+        android:id="@+id/weatherText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/forecastDateText"
+        app:layout_constraintEnd_toStartOf="@id/temperatureText"
+        app:layout_constraintStart_toEndOf="@+id/weatherIconView"
+        tools:text="Cloudy" />
 
-        <TextView
-            android:id="@+id/temperatureText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{weather.temperatureText}"/>
-    </LinearLayout>
-</layout>
+    <TextView
+        android:id="@+id/temperatureText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
+        android:paddingStart="0dp"
+        android:paddingEnd="16dp"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBaseline_toBaselineOf="@id/weatherText"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="10.69  ° C" />
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:alpha="0.6"
+        android:background="@color/primaryDarkColor"
+        app:layout_constraintEnd_toEndOf="@id/temperatureText"
+        app:layout_constraintStart_toStartOf="@+id/forecastDateText"
+        app:layout_constraintTop_toBottomOf="@id/temperatureText" />
+</androidx.constraintlayout.widget.ConstraintLayout>

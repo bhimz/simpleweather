@@ -1,50 +1,31 @@
 package com.bhimz.simpleweather.domain.model
 
-import java.text.DecimalFormat
-import java.util.*
-
 data class Weather(
     val date: Long,
-    val weather: String,
-    val temperature: Double
-) {
-    private val monthNames = listOf(
-        "JAN",
-        "FEB",
-        "MAR",
-        "APR",
-        "MAY",
-        "JUN",
-        "JUL",
-        "AUG",
-        "SEP",
-        "OCT",
-        "NOV",
-        "DEC"
-    )
-    private val tempFormat = DecimalFormat("###.##")
-
-    val dateText: String
-        get() {
-            val calendar = Calendar.getInstance()
-
-            calendar.timeInMillis = date * 1000
-            return "${monthNames[calendar.get(Calendar.MONTH)]} ${calendar.get(
-                Calendar.DATE
-            )}"
-
-        }
-
-    val temperatureText: String
-        get() {
-            val tempInCelcius = temperature - 273.15
-            return "${tempFormat.format(tempInCelcius)}° C"
-        }
-}
+    val name: String,
+    val temperature: Double,
+    val icon: String? = null
+)
 
 data class Location(
     val locationName: String,
     val latitude: Double,
     val longitude: Double
+)
+
+data class LocationBindingModel(
+    val locationName: String,
+    val latitude: Double,
+    val longitude: Double,
+    var currentWeather: String = "",
+    var weatherIconUrl: String? = null,
+    var temperature: Double = 0.0
+)
+
+data class WeatherBindingModel(
+    val date: Long,
+    val name: String,
+    val temperature: Double,
+    val weatherIconUrl: String? = null
 )
 

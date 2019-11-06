@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Simple Weather App</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="temperature_text">%,.2f ° C</string>
+    <string name="weather_icon">weather_icon</string>
 </resources>
