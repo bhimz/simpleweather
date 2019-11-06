@@ -78,7 +78,7 @@ class PlaceUtilImpl(private val placesClient: PlacesClient) : PlaceUtil {
                     } else {
                         var locationName = ""
                         addressComponents.asList().forEach {
-                            if (it.types.contains("administrative_area_level_1")) locationName = it.name
+                            if (it.types.contains("administrative_area_level_2")) locationName = it.shortName ?: it.name
                         }
                         cont.resume(
                             Location(locationName, latLng.latitude, latLng.longitude)
