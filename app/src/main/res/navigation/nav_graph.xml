@@ -33,17 +33,5 @@
             android:name="longitude"
             app:argType="float"
             android:defaultValue="0.0" />
-        <argument
-            android:name="weatherIconUrl"
-            app:argType="string"
-            android:defaultValue='""' />
-        <argument
-            android:name="weatherCondition"
-            app:argType="string"
-            android:defaultValue='""' />
-        <argument
-            android:name="temperature"
-            app:argType="float"
-            android:defaultValue="0.0" />
     </fragment>
 </navigation>

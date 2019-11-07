@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,13 +28,11 @@ class WeatherDetailFragment : Fragment() {
     private val locationName by lazy { args.locationName }
     private val latitude by lazy { args.latitude.toDouble() }
     private val longitude by lazy { args.longitude.toDouble() }
-    private val weatherCondition by lazy { args.weatherCondition }
-    private val weatherIconUrl by lazy { args.weatherIconUrl }
-    private val temperature by lazy { args.temperature.toDouble() }
 
     private var itemList = listOf<ListItemModel>()
 
     private val viewModel: WeatherDetailViewModel by inject()
+    private val weatherViewModel: WeatherMainViewModel by activityViewModels()
 
     private val weatherAdapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -79,12 +78,12 @@ class WeatherDetailFragment : Fragment() {
             false
         )
         v.locationNameText.text = locationName
-        v.weatherConditionText.text = weatherCondition
+        /*v.weatherConditionText.text = weatherCondition
         v.temperatureText.text = String.format(
             getString(R.string.temperature_text),
             temperature - 273.25
         )
-        v.weatherIconView.loadImage(weatherIconUrl)
+        v.weatherIconView.loadImage(weatherIconUrl)*/
 
         val weatherListView = v.weatherListView
         weatherListView.layoutManager = LinearLayoutManager(context)
@@ -94,6 +93,16 @@ class WeatherDetailFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        weatherViewModel.locationList.observe(this, Observer { locations ->
+            locations.find { it.locationName == locationName }?.run {
+                view?.weatherConditionText?.text = currentWeather
+                view?.temperatureText?.text = String.format(
+                    getString(R.string.temperature_text),
+                    temperature - 273.15
+                )
+                view?.weatherIconView?.loadImage(weatherIconUrl)
+            }
+        })
         viewModel.weatherList.observe(this, Observer(::onWeatherListUpdated))
         viewModel.loadForecasts(latitude, longitude)
     }

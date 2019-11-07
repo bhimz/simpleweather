@@ -60,11 +60,6 @@ class WeatherMainViewModel : ViewModel(), KoinComponent {
         withContext(Dispatchers.IO) {
             locationRepository.saveLocation(location)
         }
-        /*val bindingModel = LocationBindingModel(location.locationName, location.latitude, location.longitude)
-        val locationUpdate = _locations.value?.let {
-            it + bindingModel
-        } ?: listOf(bindingModel)
-        _locations.value = locationUpdate*/
     }
 
     private suspend fun updateWeather(location: LocationBindingModel): LocationBindingModel {

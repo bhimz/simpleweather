@@ -47,10 +47,7 @@ class WeatherFragment : Fragment() {
                         val action = WeatherFragmentDirections.actionOpenWeatherDetail(
                             location.locationName,
                             location.latitude.toFloat(),
-                            location.longitude.toFloat(),
-                            location.weatherIconUrl ?: "",
-                            location.currentWeather,
-                            location.temperature.toFloat()
+                            location.longitude.toFloat()
                         )
                         this@WeatherFragment.findNavController().navigate(action)
                     }
