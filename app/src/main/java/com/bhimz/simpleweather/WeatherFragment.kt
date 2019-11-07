@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
@@ -82,6 +83,12 @@ class WeatherFragment : Fragment() {
         }
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel.locationList.observe(this, Observer(::onUpdateLocationList))
+        viewModel.uiState.observe(this, Observer(::onUiStateChanged))
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -108,33 +115,6 @@ class WeatherFragment : Fragment() {
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
-        viewModel.locationList.observe(this, Observer(::onUpdateLocationList))
-        context?.let {
-            val requiredPermissions = mutableListOf<String>()
-            if (ContextCompat.checkSelfPermission(
-                    it,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requiredPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
-            }
-            if (ContextCompat.checkSelfPermission(
-                    it,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requiredPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
-            }
-            if (requiredPermissions.isNotEmpty()) {
-                requestPermissions(requiredPermissions.toTypedArray(), permissionRequestCode)
-            } else {
-                viewModel.initLocations()
-            }
-        }
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
@@ -156,7 +136,43 @@ class WeatherFragment : Fragment() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == permissionRequestCode && permissions.size == grantResults.filter { it == PackageManager.PERMISSION_GRANTED }.size) {
-            viewModel.initLocations()
+            viewModel.initCurrentLocation()
+        }
+    }
+
+    private fun onUiStateChanged(uiState: UiState?) {
+        uiState ?: return
+        when(uiState) {
+            is InitialState -> {
+                context?.let {
+                    val requiredPermissions = mutableListOf<String>()
+                    if (ContextCompat.checkSelfPermission(
+                            it,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        requiredPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+                    }
+                    if (ContextCompat.checkSelfPermission(
+                            it,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        requiredPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
+                    }
+                    if (requiredPermissions.isNotEmpty()) {
+                        requestPermissions(requiredPermissions.toTypedArray(), permissionRequestCode)
+                    } else {
+                        viewModel.initCurrentLocation()
+                    }
+                }
+            }
+            is LocationServiceUnavailableState -> context?.let {
+                Toast.makeText(it, "Location service is unavailable", Toast.LENGTH_SHORT)
+            }
+            is WeatherServiceUnavailableState -> context?.let {
+                Toast.makeText(it, "Weather service cannot be reached", Toast.LENGTH_SHORT)
+            }
         }
     }
 

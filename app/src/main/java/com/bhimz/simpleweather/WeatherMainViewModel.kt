@@ -20,8 +20,10 @@ class WeatherMainViewModel : ViewModel(), KoinComponent {
     private val _locations = MediatorLiveData<List<LocationBindingModel>>()
     private val savedLocations = MediatorLiveData<List<LocationBindingModel>>()
     private val currentLocation = MutableLiveData<LocationBindingModel>()
+    private val _uiState = MutableLiveData<UiState>().apply { value = InitialState() }
 
     val locationList: LiveData<List<LocationBindingModel>> = _locations
+    val uiState: LiveData<UiState> = _uiState
 
     init {
         _locations.addSource(currentLocation) { data ->
@@ -36,20 +38,38 @@ class WeatherMainViewModel : ViewModel(), KoinComponent {
             val models = data.map { LocationBindingModel(it.locationName, it.latitude, it.longitude) }
             savedLocations.postValue(models)
             viewModelScope.launch {
-                val updatedModels = models.map { updateWeather(it) }
-                savedLocations.postValue(updatedModels)
+                try {
+                    val updatedModels = models.map { updateWeather(it) }
+                    savedLocations.postValue(updatedModels)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    _uiState.value = WeatherServiceUnavailableState()
+                }
             }
         }
     }
 
-    fun initLocations() = viewModelScope.launch {
+    fun initCurrentLocation() = viewModelScope.launch {
+        _uiState.value = UpdatingLocationState()
         val loc =
-            getCurrentLocation()?.run {
-                val model = LocationBindingModel(locationName, latitude, longitude)
-                updateWeather(model)
+            try {
+                getCurrentLocation()?.run { LocationBindingModel(locationName, latitude, longitude) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
             }
-                ?: return@launch
-        currentLocation.value = loc
+        if (loc == null) {
+            _uiState.value = LocationServiceUnavailableState()
+        } else {
+            currentLocation.value = loc
+            try {
+                currentLocation.value = updateWeather(loc)
+                _uiState.value = LocationUpdatedState()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _uiState.value = WeatherServiceUnavailableState()
+            }
+        }
     }
 
     private suspend fun getCurrentLocation() = placeUtil.findCurrentPlace()?.let {
@@ -71,3 +91,10 @@ class WeatherMainViewModel : ViewModel(), KoinComponent {
         )
     }
 }
+
+interface UiState
+class InitialState : UiState
+class UpdatingLocationState : UiState
+class LocationUpdatedState : UiState
+class LocationServiceUnavailableState : UiState
+class WeatherServiceUnavailableState: UiState
