@@ -35,7 +35,7 @@ class WeatherFragment : Fragment() {
     private val permissionRequestCode = 1001
     private val placeAutoCompleteRequestCode = 1002
 
-    private val viewModel: WeatherMainViewModel by activityViewModels()
+    private val viewModel: LocationViewModel by activityViewModels()
 
     private var listItems: List<ListItemModel> = listOf()
 

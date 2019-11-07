@@ -12,7 +12,7 @@ import kotlinx.coroutines.withContext
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
-class WeatherMainViewModel : ViewModel(), KoinComponent {
+class LocationViewModel : ViewModel(), KoinComponent {
     private val locationRepository: LocationRepository by inject()
     private val weatherRepository: WeatherRepository by inject()
     private val placeUtil: PlaceUtil by inject()

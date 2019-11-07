@@ -30,8 +30,8 @@ class WeatherDetailFragment : Fragment() {
 
     private var itemList = listOf<ListItemModel>()
 
-    private val viewModel: WeatherDetailViewModel by inject()
-    private val weatherViewModel: WeatherMainViewModel by activityViewModels()
+    private val viewModel: ForecastViewModel by inject()
+    private val weatherViewModel: LocationViewModel by activityViewModels()
 
     private val weatherAdapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
