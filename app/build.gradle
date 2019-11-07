@@ -129,4 +129,7 @@ dependencies {
     //ConstraintLayout 2.0
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta3'
 
+    //Work Manager
+    implementation "androidx.work:work-runtime-ktx:$work_version"
+
 }
