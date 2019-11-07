@@ -80,13 +80,9 @@ class WeatherDetailFragment : Fragment() {
         val weatherListView = v.weatherListView
         weatherListView.layoutManager = LinearLayoutManager(context)
         weatherListView.adapter = weatherAdapter
-        return v
-    }
 
-    override fun onStart() {
-        super.onStart()
         val detailIndex = args.detailIndex
-        weatherViewModel.locationList.observe(this, Observer { locations ->
+        weatherViewModel.locationList.observe(viewLifecycleOwner, Observer { locations ->
             if (detailIndex >= locations.size) return@Observer
             locations[detailIndex].run {
                 view?.locationNameText?.text = locationName
@@ -106,7 +102,14 @@ class WeatherDetailFragment : Fragment() {
                 }
             }
         })
-        viewModel.weatherList.observe(this, Observer(::onWeatherListUpdated))
+        viewModel.weatherList.observe(viewLifecycleOwner, Observer(::onWeatherListUpdated))
+
+        return v
+    }
+
+    override fun onStart() {
+        super.onStart()
+
     }
 
     private fun onWeatherListUpdated(weatherList: List<WeatherBindingModel>?) {

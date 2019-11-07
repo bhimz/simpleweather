@@ -85,8 +85,6 @@ class WeatherFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.locationList.observe(this, Observer(::onUpdateLocationList))
-        viewModel.uiState.observe(this, Observer(::onUiStateChanged))
     }
 
     override fun onCreateView(
@@ -112,6 +110,9 @@ class WeatherFragment : Fragment() {
             ).build(context)
             startActivityForResult(intent, placeAutoCompleteRequestCode)
         }
+
+        viewModel.locationList.observe(viewLifecycleOwner, Observer(::onUpdateLocationList))
+        viewModel.uiState.observe(viewLifecycleOwner, Observer(::onUiStateChanged))
         return binding.root
     }
 
@@ -168,10 +169,10 @@ class WeatherFragment : Fragment() {
                 }
             }
             is LocationServiceUnavailableState -> context?.let {
-                Toast.makeText(it, "Location service is unavailable", Toast.LENGTH_SHORT)
+                Toast.makeText(it, "Location service is unavailable", Toast.LENGTH_SHORT).show()
             }
             is WeatherServiceUnavailableState -> context?.let {
-                Toast.makeText(it, "Weather service cannot be reached", Toast.LENGTH_SHORT)
+                Toast.makeText(it, "Weather service cannot be reached", Toast.LENGTH_SHORT).show()
             }
         }
     }
