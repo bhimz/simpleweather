@@ -1,54 +1,55 @@
 package com.bhimz.simpleweather
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.bhimz.simpleweather.domain.model.Location
 import com.bhimz.simpleweather.domain.model.LocationBindingModel
 import com.bhimz.simpleweather.domain.repository.LocationRepository
 import com.bhimz.simpleweather.domain.repository.WeatherRepository
 import com.bhimz.simpleweather.util.PlaceUtil
-import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
-import com.google.android.libraries.places.api.net.PlacesClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 class WeatherMainViewModel : ViewModel(), KoinComponent {
     private val locationRepository: LocationRepository by inject()
     private val weatherRepository: WeatherRepository by inject()
     private val placeUtil: PlaceUtil by inject()
 
-    private val _locations = MutableLiveData<List<LocationBindingModel>>().apply { value = listOf() }
+    private val _locations = MediatorLiveData<List<LocationBindingModel>>()
+    private val savedLocations = MediatorLiveData<List<LocationBindingModel>>()
+    private val currentLocation = MutableLiveData<LocationBindingModel>()
 
     val locationList: LiveData<List<LocationBindingModel>> = _locations
 
+    init {
+        _locations.addSource(currentLocation) { data ->
+            _locations.value = listOf(data) + (savedLocations.value ?: listOf())
+        }
+        _locations.addSource(savedLocations) { data ->
+            _locations.value =
+                listOf(currentLocation.value ?:
+                LocationBindingModel("", 0.0, 0.0)) + data
+        }
+        savedLocations.addSource(locationRepository.getAllLocations()) { data ->
+            val models = data.map { LocationBindingModel(it.locationName, it.latitude, it.longitude) }
+            savedLocations.postValue(models)
+            viewModelScope.launch {
+                val updatedModels = models.map { updateWeather(it) }
+                savedLocations.postValue(updatedModels)
+            }
+        }
+    }
+
     fun initLocations() = viewModelScope.launch {
-        val currentLocation = getCurrentLocation()
-        val locations = (currentLocation?.let { listOf(it) }
-            ?: listOf()) + withContext(Dispatchers.IO) {
-            locationRepository.getAllLocations().map {
-                LocationBindingModel(it.locationName, it.latitude, it.longitude)
+        val loc =
+            getCurrentLocation()?.run {
+                val model = LocationBindingModel(locationName, latitude, longitude)
+                updateWeather(model)
             }
-        }
-        _locations.value = locations
-        //update weather information
-        val updatedLocation = locations.map {
-            try {
-                updateWeather(it)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                it
-            }
-        }
-        _locations.value = updatedLocation
+                ?: return@launch
+        currentLocation.value = loc
     }
 
     private suspend fun getCurrentLocation() = placeUtil.findCurrentPlace()?.let {
@@ -59,11 +60,11 @@ class WeatherMainViewModel : ViewModel(), KoinComponent {
         withContext(Dispatchers.IO) {
             locationRepository.saveLocation(location)
         }
-        val bindingModel = LocationBindingModel(location.locationName, location.latitude, location.longitude)
+        /*val bindingModel = LocationBindingModel(location.locationName, location.latitude, location.longitude)
         val locationUpdate = _locations.value?.let {
             it + bindingModel
         } ?: listOf(bindingModel)
-        _locations.value = locationUpdate
+        _locations.value = locationUpdate*/
     }
 
     private suspend fun updateWeather(location: LocationBindingModel): LocationBindingModel {

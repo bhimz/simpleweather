@@ -1,5 +1,6 @@
 package com.bhimz.simpleweather.domain.db.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -15,6 +16,6 @@ interface LocationDao {
     suspend fun getLocationData(locationName: String): LocationData?
 
     @Query("select * from LocationData order by location_name")
-    suspend fun getAllLocations(): List<LocationData>
+    fun getAllLocations(): LiveData<List<LocationData>>
 
 }
