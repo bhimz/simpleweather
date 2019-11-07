@@ -42,13 +42,10 @@ class WeatherFragment : Fragment() {
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             when (holder) {
                 is LocationViewHolder -> {
-                    holder.binding.location = listItems[position].itemData()
-                    holder.binding.setOnLocationClickListener { location ->
-                        val action = WeatherFragmentDirections.actionOpenWeatherDetail(
-                            location.locationName,
-                            location.latitude.toFloat(),
-                            location.longitude.toFloat()
-                        )
+                    val item = listItems[position]
+                    holder.binding.location = item.itemData()
+                    holder.binding.setOnLocationClickListener {
+                        val action = WeatherFragmentDirections.actionOpenWeatherDetail(item.actualIndex)
                         this@WeatherFragment.findNavController().navigate(action)
                     }
                 }
@@ -165,12 +162,12 @@ class WeatherFragment : Fragment() {
 
     private fun onUpdateLocationList(locations: List<LocationBindingModel>?) {
         locations ?: return
-        val items = mutableListOf(ListItemModel(HEADER_VIEW, "Current Location"))
+        val items = mutableListOf(ListItemModel(-1, HEADER_VIEW, "Current Location"))
         locations.forEachIndexed { index, model ->
             if (index == 1) {
-                items.add(ListItemModel(HEADER_VIEW, "Saved Locations"))
+                items.add(ListItemModel(-1, HEADER_VIEW, "Saved Locations"))
             }
-            items.add(ListItemModel(ITEM_VIEW, model))
+            items.add(ListItemModel(index, ITEM_VIEW, model))
         }
         listItems = items
         locationAdapter.notifyDataSetChanged()

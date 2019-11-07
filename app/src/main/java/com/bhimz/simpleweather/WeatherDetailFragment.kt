@@ -25,9 +25,8 @@ import kotlinx.android.synthetic.main.view_weather_listitem.view.weatherText
 class WeatherDetailFragment : Fragment() {
 
     private val args: WeatherDetailFragmentArgs by navArgs()
-    private val locationName by lazy { args.locationName }
-    private val latitude by lazy { args.latitude.toDouble() }
-    private val longitude by lazy { args.longitude.toDouble() }
+    private var currentLatitude = 0.0
+    private var currentLongitude = 0.0
 
     private var itemList = listOf<ListItemModel>()
 
@@ -77,13 +76,6 @@ class WeatherDetailFragment : Fragment() {
             container,
             false
         )
-        v.locationNameText.text = locationName
-        /*v.weatherConditionText.text = weatherCondition
-        v.temperatureText.text = String.format(
-            getString(R.string.temperature_text),
-            temperature - 273.25
-        )
-        v.weatherIconView.loadImage(weatherIconUrl)*/
 
         val weatherListView = v.weatherListView
         weatherListView.layoutManager = LinearLayoutManager(context)
@@ -93,18 +85,28 @@ class WeatherDetailFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        val detailIndex = args.detailIndex
         weatherViewModel.locationList.observe(this, Observer { locations ->
-            locations.find { it.locationName == locationName }?.run {
+            if (detailIndex >= locations.size) return@Observer
+            locations[detailIndex].run {
+                view?.locationNameText?.text = locationName
                 view?.weatherConditionText?.text = currentWeather
-                view?.temperatureText?.text = String.format(
-                    getString(R.string.temperature_text),
-                    temperature - 273.15
-                )
+                view?.temperatureText?.text =
+                    if (temperature == 0.0) resources.getString(R.string.double_dash)
+                    else
+                        String.format(
+                            getString(R.string.temperature_text),
+                            temperature - 273.15
+                        )
                 view?.weatherIconView?.loadImage(weatherIconUrl)
+                if (latitude != currentLatitude || longitude != currentLongitude) { //handle if current location has changed
+                    currentLatitude = latitude
+                    currentLongitude = longitude
+                    viewModel.loadForecasts(latitude, longitude)
+                }
             }
         })
         viewModel.weatherList.observe(this, Observer(::onWeatherListUpdated))
-        viewModel.loadForecasts(latitude, longitude)
     }
 
     private fun onWeatherListUpdated(weatherList: List<WeatherBindingModel>?) {
@@ -112,13 +114,13 @@ class WeatherDetailFragment : Fragment() {
         val items = mutableListOf<ListItemModel>()
         val headerFormat = SimpleDateFormat("MMM dd", Locale.US)
         var prevHeaderText = ""
-        weatherList.forEach { weather ->
+        weatherList.forEachIndexed { i, weather ->
             val headerText = headerFormat.format(Date(weather.date * 1000))
             if (prevHeaderText != headerText) {
-                items.add(ListItemModel(HEADER_VIEW, headerText))
+                items.add(ListItemModel(-1, HEADER_VIEW, headerText))
                 prevHeaderText = headerText
             }
-            items.add(ListItemModel(ITEM_VIEW, weather))
+            items.add(ListItemModel(i, ITEM_VIEW, weather))
         }
         this.itemList = items
         weatherAdapter.notifyDataSetChanged()
