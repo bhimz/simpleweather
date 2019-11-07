@@ -11,16 +11,14 @@ class WeatherRepository(
     suspend fun getWeatherForecast(latitude: Double, longitude: Double): List<Weather>? {
         val response = weatherApi.getWeatherForecast(latitude, longitude, appId)
         return response.list.map {
-            val weather = it.weather[0]
-            Weather(it.dt, weather.main, it.main.temp, weather.icon)
+            Weather(it.dt, it.weatherCondition, it.temperature, it.icon)
         }
     }
 
     suspend fun getCurrentWeather(latitude: Double, longitude: Double): Weather {
         val response = weatherApi.getCurrentWeather(latitude, longitude, appId)
         return response.run {
-            val weather = weather[0]
-            Weather(dt, weather.main, main.temp, weather.icon)
+            Weather(dt, weatherCondition, temperature, icon)
         }
     }
 }

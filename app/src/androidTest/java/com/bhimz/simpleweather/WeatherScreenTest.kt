@@ -14,10 +14,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.bhimz.simpleweather.di.appModule
 import com.bhimz.simpleweather.di.netModule
 import com.bhimz.simpleweather.di.testDbModule
-import com.bhimz.simpleweather.domain.model.ForecastResponse
 import com.bhimz.simpleweather.domain.model.Location
-import com.bhimz.simpleweather.domain.model.WeatherResponse
-import com.bhimz.simpleweather.domain.net.WeatherApi
 import com.bhimz.simpleweather.util.PlaceUtil
 import com.nhaarman.mockitokotlin2.*
 import org.junit.After
@@ -147,19 +144,9 @@ class WeatherScreenTest : KoinTest {
             verify(mockNavController).navigate(check<NavDirections> {
                 val args = WeatherDetailFragmentArgs.fromBundle(it.arguments)
                 assertEquals(
-                    "location name should match",
-                    currentLocation.locationName,
-                    args.locationName
-                )
-                assertEquals(
-                    "latitude should match",
-                    currentLocation.latitude.toFloat(),
-                    args.latitude
-                )
-                assertEquals(
-                    "longitude name should match",
-                    currentLocation.longitude.toFloat(),
-                    args.longitude
+                    "detail index should match",
+                    0,
+                    args.detailIndex
                 )
             })
         } catch (e: Exception) {
@@ -180,11 +167,7 @@ class WeatherScreenTest : KoinTest {
             onBlocking { findCurrentPlace() } doReturn currentLocation
         }
 
-        val fragmentArgs = WeatherFragmentDirections.actionOpenWeatherDetail(
-            locationName,
-            latitude,
-            longitude
-        ).arguments
+        val fragmentArgs = WeatherFragmentDirections.actionOpenWeatherDetail(0).arguments
 
         loadKoinModules(
             listOf(

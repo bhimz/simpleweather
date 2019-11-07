@@ -5,12 +5,16 @@ import com.bhimz.simpleweather.BuildConfig
 import com.bhimz.simpleweather.WeatherMainViewModel
 import com.bhimz.simpleweather.WeatherDetailViewModel
 import com.bhimz.simpleweather.domain.db.AppDatabase
+import com.bhimz.simpleweather.domain.model.WeatherData
+import com.bhimz.simpleweather.domain.model.WeatherDataDeserializer
 import com.bhimz.simpleweather.domain.net.WeatherApi
 import com.bhimz.simpleweather.domain.repository.LocationRepository
 import com.bhimz.simpleweather.domain.repository.WeatherRepository
 import com.bhimz.simpleweather.util.PlaceUtil
 import com.bhimz.simpleweather.util.PlaceUtilImpl
 import com.google.android.libraries.places.api.Places
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -57,9 +61,15 @@ val netModule = module {
             .addInterceptor(get())
             .build() }
     single {
+        GsonBuilder()
+            .registerTypeAdapter(
+                WeatherData::class.java,
+                WeatherDataDeserializer()
+            ).create() }
+    single {
         Retrofit.Builder()
             .baseUrl("https://api.openweathermap.org/data/2.5/")
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(get()))
             .client(get())
             .build()
     }
