@@ -27,13 +27,14 @@ class LocationViewModel : ViewModel(), KoinComponent {
     private val savedLocations = locationRepository.getAllLocations()
     private val mergedLocation = MediatorLiveData<List<Location>>()
 
-    private val weatherMap = mutableMapOf<Int, Weather>()
+    //in memory data source for weather and additional detail info
+    private val weatherDataSource = mutableMapOf<Int, Weather>()
+    private val detailDataSource = mutableMapOf<Int, AdditionalInfo>()
+
     private val dataUpdate = MutableLiveData<LiveEvent<Any>>()
-    private val detailMap = mutableMapOf<Int, LocationDetail>()
 
     private val _locations = MediatorLiveData<List<LocationBindingModel>>()
     val locationList: LiveData<List<LocationBindingModel>> = _locations
-
 
     private val _uiState = MutableLiveData<UiState>().apply { value = InitialState() }
     val uiState: LiveData<UiState> = _uiState
@@ -53,7 +54,7 @@ class LocationViewModel : ViewModel(), KoinComponent {
 
         _locations.addSource(mergedLocation) { data ->
             val models = data.map { loc ->
-                val w = weatherMap[loc.id]
+                val w = weatherDataSource[loc.id]
                 LocationBindingModel(
                     loc.id,
                     loc.locationName,
@@ -62,7 +63,7 @@ class LocationViewModel : ViewModel(), KoinComponent {
                     w?.name ?: "",
                     w?.icon?.let { "http://openweathermap.org/img/wn/${it}@2x.png" } ?: "",
                     w?.temperature ?: 0.0,
-                    detailMap[loc.id] ?: LocationDetail()
+                    detailDataSource[loc.id] ?: AdditionalInfo()
                 )
             }
             _locations.value = models
@@ -77,7 +78,7 @@ class LocationViewModel : ViewModel(), KoinComponent {
             update.getContentIfNotHandled()?.let { data ->
                 val updatedLoc = when (data) {
                     is WeatherUpdate -> {
-                        weatherMap[data.updateTo.id] = data.weather
+                        weatherDataSource[data.updateTo.id] = data.weather
                         _locations.value?.map {
                             if (it.id == data.updateTo.id) {
                                 it.copy(
@@ -88,11 +89,24 @@ class LocationViewModel : ViewModel(), KoinComponent {
                             } else it
                         }
                     }
+                    is DetailStateUpdate -> {
+                        val detail = (detailDataSource[data.locationId] ?: AdditionalInfo()).copy(
+                            isCollapsed = data.isCollapsed
+                        )
+                        detailDataSource[data.locationId] = detail
+                        _locations.value?.map {
+                            if (it.id == data.locationId) {
+                                it.copy(
+                                    detail = detail
+                                )
+                            } else it
+                        }
+                    }
                     is ForecastUpdate -> {
-                        val detail = detailMap[data.locationId] ?: LocationDetail()
-                        detailMap[data.locationId] = detail.copy(
+                        val detail = (detailDataSource[data.locationId] ?: AdditionalInfo()).copy(
                             forecasts = data.forecasts
                         )
+                        detailDataSource[data.locationId] = detail
                         _locations.value?.map {
                             if (it.id == data.locationId) {
                                 it.copy(
@@ -146,6 +160,16 @@ class LocationViewModel : ViewModel(), KoinComponent {
         }
     }
 
+    fun updateDetailState(location: LocationBindingModel, isCollapsed: Boolean) =
+        viewModelScope.launch {
+            dataUpdate.value = LiveEvent(DetailStateUpdate(location.id, isCollapsed))
+            if (!isCollapsed && location.detail.forecasts == null) {
+                loadForecasts(location)?.let {
+                    dataUpdate.value = LiveEvent(ForecastUpdate(location.id, it))
+                }
+            }
+        }
+
     private fun updateWeatherInfo(locations: List<LocationBindingModel>) =
         viewModelScope.launch {
             try {
@@ -158,26 +182,11 @@ class LocationViewModel : ViewModel(), KoinComponent {
                 _uiState.value = WeatherServiceUnavailableState()
             }
         }
-
-    /*fun openDetail(location: LocationBindingModel, expand: Boolean) =
-        viewModelScope.launch {
-            val loc = locationList.value?.find { it.id == location.id }
-            if (loc != null) {
-                when {
-                    expand && loc.detail.forecasts.isNullOrEmpty() -> {
-                        loadForecasts(loc)?.let { detail ->
-                            detailMap[loc.id] = detail.copy(isCollapsed = true)
-                        }
-                    }
-                }
-            }
-        }
-
-    private suspend fun loadForecasts(location: LocationBindingModel): LocationDetail? {
+    private suspend fun loadForecasts(location: LocationBindingModel): List<ForecastBindingModel>? {
         try {
             val weatherList = weatherRepository
                 .getWeatherForecast(location.latitude, location.longitude) ?: return null
-            val dateFormat = SimpleDateFormat("dd MM", Locale.US)
+            val dateFormat = SimpleDateFormat("MMM dd", Locale.US)
             var currentTimeString = dateFormat.format(Date(System.currentTimeMillis()))
             val forecasts = mutableListOf<ForecastBindingModel>()
             weatherList.forEach {
@@ -193,20 +202,19 @@ class LocationViewModel : ViewModel(), KoinComponent {
                     )
                 }
             }
-            return location.detail.copy(
-                forecasts = forecasts
-            )
+            return forecasts
 
         } catch (e: Exception) {
             e.printStackTrace()
             return null
         }
-    }*/
+    }
 
 }
 
 class WeatherUpdate(val weather: Weather, val updateTo: LocationBindingModel)
 class ForecastUpdate(val locationId: Int, val forecasts: List<ForecastBindingModel>)
+class DetailStateUpdate(val locationId: Int, val isCollapsed: Boolean)
 
 interface UiState
 class InitialState : UiState

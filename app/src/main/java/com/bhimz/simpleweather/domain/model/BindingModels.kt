@@ -8,10 +8,10 @@ data class LocationBindingModel(
     val currentWeather: String = "",
     val weatherIconUrl: String? = null,
     val temperature: Double = 0.0,
-    val detail: LocationDetail = LocationDetail()
+    val detail: AdditionalInfo = AdditionalInfo()
 )
 
-data class LocationDetail(
+data class AdditionalInfo(
     val isCollapsed:Boolean = true,
     val forecasts: List<ForecastBindingModel>? = null
 )

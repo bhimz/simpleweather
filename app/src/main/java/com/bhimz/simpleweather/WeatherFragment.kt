@@ -29,7 +29,7 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.bhimz.simpleweather.domain.model.Location
-import com.bhimz.simpleweather.domain.model.LocationDetail
+import com.bhimz.simpleweather.domain.model.AdditionalInfo
 import com.bhimz.simpleweather.util.loadImage
 import kotlinx.android.synthetic.main.view_forecast_listitem.view.*
 import java.text.SimpleDateFormat
@@ -52,6 +52,9 @@ class WeatherFragment : Fragment() {
                     val data = item.itemData<LocationBindingModel>()
                     holder.binding.detailView.detailItem(data.detail)
                     holder.binding.location = data
+                    holder.binding.collapseBtn.setOnClickListener {
+                        viewModel.updateDetailState(data, !data.detail.isCollapsed)
+                    }
                     holder.binding.setOnLocationClickListener {
                         val action = WeatherFragmentDirections.actionOpenWeatherDetail(item.actualIndex)
                         this@WeatherFragment.findNavController().navigate(action)
@@ -214,12 +217,12 @@ class WeatherFragment : Fragment() {
             }
         }
     }
-    fun ViewGroup.detailItem(detail: LocationDetail) {
+    fun ViewGroup.detailItem(detail: AdditionalInfo) {
         val dateFormat = SimpleDateFormat("MMM dd", Locale.US)
         removeAllViews()
         detail.forecasts?.forEach {
             val view = LayoutInflater.from(context).inflate(R.layout.view_forecast_listitem, this, false)
-            view.forecastDateText.text = dateFormat.format(Date(it.date))
+            view.forecastDateText.text = dateFormat.format(Date(it.date * 1000))
             view.weatherIconView.loadImage(it.weatherIconUrl)
             view.temperatureText.text =
                 if (it.temperature == 0.0) resources.getString(R.string.double_dash)
