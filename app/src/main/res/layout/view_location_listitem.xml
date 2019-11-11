@@ -22,7 +22,6 @@
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="16dp"
         android:background="@color/primaryColor"
-        android:onClick="@{() -> clickListener.onClick(location)}"
         app:cardCornerRadius="8dp"
         app:cardElevation="6dp">
 
@@ -33,15 +32,16 @@
 
             <TextView
                 android:id="@+id/locationNameText"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@{location.locationName}"
                 android:textColor="@android:color/black"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                app:layout_constraintHorizontal_chainStyle="spread_inside"
-                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="spread_inside"
                 tools:text="@sample/location_item_list.json/data/location_name" />
 
             <ImageView
@@ -49,14 +49,10 @@
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:contentDescription="@string/weather_icon"
-                android:scaleType="matrix"
+                android:scaleType="fitCenter"
                 app:imageUrl="@{location.weatherIconUrl}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintHorizontal_chainStyle="spread_inside"
-                app:layout_constraintLeft_toRightOf="@+id/locationNameText"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/locationNameText" />
 
             <TextView
                 android:id="@+id/weatherConditionText"
@@ -64,8 +60,10 @@
                 android:layout_height="wrap_content"
                 android:text="@{location.currentWeather}"
                 android:textSize="18sp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/locationNameText"
+                app:layout_constraintBottom_toTopOf="@id/temperatureText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/locationNameText"
+                app:layout_constraintVertical_chainStyle="packed"
                 tools:text="@sample/location_item_list.json/data/weather_condition" />
 
             <TextView
@@ -75,11 +73,43 @@
                 android:layout_marginTop="4dp"
                 android:text="@{ location.temperature == 0.0 ? @string/double_dash : String.format(@string/temperature_text, location.temperature - 273.15)  }"
                 android:textColor="@android:color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/weatherIconView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/weatherConditionText"
+                tools:text="@sample/location_item_list.json/data/temperature" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:onClick="@{() -> clickListener.onClick(location)}"
+                android:text="@string/detail"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/weatherConditionText"
-                tools:text="@sample/location_item_list.json/data/temperature" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/weatherIconView" />
+
+            <ImageView
+                android:id="@+id/collapseBtn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/weatherIconView" />
+
+            <LinearLayout
+                android:id="@+id/detailView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/collapseBtn"
+                android:orientation="vertical"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 

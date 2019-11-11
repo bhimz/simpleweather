@@ -1,17 +1,18 @@
 package com.bhimz.simpleweather
 
 import androidx.lifecycle.*
-import com.bhimz.simpleweather.domain.model.Location
-import com.bhimz.simpleweather.domain.model.LocationBindingModel
-import com.bhimz.simpleweather.domain.model.Weather
+import com.bhimz.simpleweather.domain.model.*
 import com.bhimz.simpleweather.domain.repository.LocationRepository
 import com.bhimz.simpleweather.domain.repository.WeatherRepository
+import com.bhimz.simpleweather.util.LiveEvent
 import com.bhimz.simpleweather.util.PlaceUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.text.SimpleDateFormat
+import java.util.*
 
 class LocationViewModel : ViewModel(), KoinComponent {
     private val locationRepository: LocationRepository by inject()
@@ -26,56 +27,99 @@ class LocationViewModel : ViewModel(), KoinComponent {
     private val savedLocations = locationRepository.getAllLocations()
     private val mergedLocation = MediatorLiveData<List<Location>>()
 
-    private val weatherMap = mutableMapOf<String, Weather>()
-    private val weatherUpdate = MutableLiveData<WeatherUpdate>()
+    private val weatherMap = mutableMapOf<Int, Weather>()
+    private val dataUpdate = MutableLiveData<LiveEvent<Any>>()
+    private val detailMap = mutableMapOf<Int, LocationDetail>()
 
     private val _locations = MediatorLiveData<List<LocationBindingModel>>()
     val locationList: LiveData<List<LocationBindingModel>> = _locations
+
 
     private val _uiState = MutableLiveData<UiState>().apply { value = InitialState() }
     val uiState: LiveData<UiState> = _uiState
 
     init {
         mergedLocation.addSource(currentLocation) {
-            mergedLocation.value = listOf(it) + (savedLocations.value ?: listOf())
+            mergeLocationData(currentLocation, savedLocations)?.let {
+                mergedLocation.value = it
+            }
         }
 
         mergedLocation.addSource(savedLocations) {
-            mergedLocation.value = listOf(currentLocation.value ?: Location()) + it
+            mergeLocationData(currentLocation, savedLocations)?.let {
+                mergedLocation.value = it
+            }
         }
 
         _locations.addSource(mergedLocation) { data ->
             val models = data.map { loc ->
-                val w = weatherMap[loc.locationName]
+                val w = weatherMap[loc.id]
                 LocationBindingModel(
+                    loc.id,
                     loc.locationName,
                     loc.latitude,
                     loc.longitude,
                     w?.name ?: "",
                     w?.icon?.let { "http://openweathermap.org/img/wn/${it}@2x.png" } ?: "",
-                    w?.temperature ?: 0.0
+                    w?.temperature ?: 0.0,
+                    detailMap[loc.id] ?: LocationDetail()
                 )
             }
             _locations.value = models
-            val needUpdate = models.filter { it.latitude != 0.0 && it.longitude != 0.0 && it.currentWeather == "" }
+            val needUpdate =
+                models.filter { it.latitude != 0.0 && it.longitude != 0.0 && it.currentWeather == "" }
             if (needUpdate.isNotEmpty()) {
                 updateWeatherInfo(needUpdate)
             }
         }
 
-        _locations.addSource(weatherUpdate) { data ->
-            weatherMap[data.updateTo.locationName] = data.weather
-            val updatedLoc = _locations.value?.map {
-                if (it.locationName == data.updateTo.locationName) {
-                    it.copy(
-                        currentWeather = data.weather.name,
-                        weatherIconUrl = "http://openweathermap.org/img/wn/${data.weather.icon}@2x.png",
-                        temperature = data.weather.temperature
-                    )
-                } else it
-            } ?: return@addSource
+        _locations.addSource(dataUpdate) { update ->
+            update.getContentIfNotHandled()?.let { data ->
+                val updatedLoc = when (data) {
+                    is WeatherUpdate -> {
+                        weatherMap[data.updateTo.id] = data.weather
+                        _locations.value?.map {
+                            if (it.id == data.updateTo.id) {
+                                it.copy(
+                                    currentWeather = data.weather.name,
+                                    weatherIconUrl = "http://openweathermap.org/img/wn/${data.weather.icon}@2x.png",
+                                    temperature = data.weather.temperature
+                                )
+                            } else it
+                        }
+                    }
+                    is ForecastUpdate -> {
+                        val detail = detailMap[data.locationId] ?: LocationDetail()
+                        detailMap[data.locationId] = detail.copy(
+                            forecasts = data.forecasts
+                        )
+                        _locations.value?.map {
+                            if (it.id == data.locationId) {
+                                it.copy(
+                                    detail = detail
+                                )
+                            } else it
+                        }
+                    }
+                    else -> null
+                }
+                updatedLoc?.let {
+                    _locations.value = it
+                }
+            }
+        }
+    }
 
-            _locations.value = updatedLoc
+    private fun mergeLocationData(
+        currentData: LiveData<Location>,
+        savedData: LiveData<List<Location>>
+    ): List<Location>? {
+        val current = currentData.value
+        val saved = savedData.value
+        return if (current == null || saved == null) {
+            null
+        } else {
+            listOf(current) + saved
         }
     }
 
@@ -107,20 +151,66 @@ class LocationViewModel : ViewModel(), KoinComponent {
             try {
                 for (it in locations) {
                     val weather = weatherRepository.getCurrentWeather(it.latitude, it.longitude)
-                    weatherUpdate.value = WeatherUpdate(weather, it)
+                    dataUpdate.value = LiveEvent(WeatherUpdate(weather, it))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 _uiState.value = WeatherServiceUnavailableState()
             }
         }
+
+    /*fun openDetail(location: LocationBindingModel, expand: Boolean) =
+        viewModelScope.launch {
+            val loc = locationList.value?.find { it.id == location.id }
+            if (loc != null) {
+                when {
+                    expand && loc.detail.forecasts.isNullOrEmpty() -> {
+                        loadForecasts(loc)?.let { detail ->
+                            detailMap[loc.id] = detail.copy(isCollapsed = true)
+                        }
+                    }
+                }
+            }
+        }
+
+    private suspend fun loadForecasts(location: LocationBindingModel): LocationDetail? {
+        try {
+            val weatherList = weatherRepository
+                .getWeatherForecast(location.latitude, location.longitude) ?: return null
+            val dateFormat = SimpleDateFormat("dd MM", Locale.US)
+            var currentTimeString = dateFormat.format(Date(System.currentTimeMillis()))
+            val forecasts = mutableListOf<ForecastBindingModel>()
+            weatherList.forEach {
+                val timeString = dateFormat.format(Date(it.date * 1000))
+                if (timeString != currentTimeString) {
+                    currentTimeString = timeString
+                    forecasts.add(
+                        ForecastBindingModel(
+                            it.date,
+                            "http://openweathermap.org/img/wn/${it.icon}@2x.png",
+                            it.temperature
+                        )
+                    )
+                }
+            }
+            return location.detail.copy(
+                forecasts = forecasts
+            )
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+    }*/
+
 }
 
 class WeatherUpdate(val weather: Weather, val updateTo: LocationBindingModel)
+class ForecastUpdate(val locationId: Int, val forecasts: List<ForecastBindingModel>)
 
 interface UiState
 class InitialState : UiState
 class UpdatingLocationState : UiState
 class LocationUpdatedState : UiState
 class LocationServiceUnavailableState : UiState
-class WeatherServiceUnavailableState: UiState
+class WeatherServiceUnavailableState : UiState

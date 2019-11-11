@@ -29,6 +29,11 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.bhimz.simpleweather.domain.model.Location
+import com.bhimz.simpleweather.domain.model.LocationDetail
+import com.bhimz.simpleweather.util.loadImage
+import kotlinx.android.synthetic.main.view_forecast_listitem.view.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class WeatherFragment : Fragment() {
@@ -44,7 +49,9 @@ class WeatherFragment : Fragment() {
             when (holder) {
                 is LocationViewHolder -> {
                     val item = listItems[position]
-                    holder.binding.location = item.itemData()
+                    val data = item.itemData<LocationBindingModel>()
+                    holder.binding.detailView.detailItem(data.detail)
+                    holder.binding.location = data
                     holder.binding.setOnLocationClickListener {
                         val action = WeatherFragmentDirections.actionOpenWeatherDetail(item.actualIndex)
                         this@WeatherFragment.findNavController().navigate(action)
@@ -81,10 +88,6 @@ class WeatherFragment : Fragment() {
                 }
             }
         }
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
     }
 
     override fun onCreateView(
@@ -124,7 +127,13 @@ class WeatherFragment : Fragment() {
                 val placeName = place.name
                 val latLng = place.latLng
                 if (placeName != null && latLng != null) {
-                    viewModel.addNewLocation(Location(placeName, latLng.latitude, latLng.longitude))
+                    viewModel.addNewLocation(
+                        Location(
+                            locationName = placeName,
+                            latitude = latLng.latitude,
+                            longitude = latLng.longitude
+                        )
+                    )
                 }
             }
         }
@@ -205,4 +214,19 @@ class WeatherFragment : Fragment() {
             }
         }
     }
+    fun ViewGroup.detailItem(detail: LocationDetail) {
+        val dateFormat = SimpleDateFormat("MMM dd", Locale.US)
+        removeAllViews()
+        detail.forecasts?.forEach {
+            val view = LayoutInflater.from(context).inflate(R.layout.view_forecast_listitem, this, false)
+            view.forecastDateText.text = dateFormat.format(Date(it.date))
+            view.weatherIconView.loadImage(it.weatherIconUrl)
+            view.temperatureText.text =
+                if (it.temperature == 0.0) resources.getString(R.string.double_dash)
+                else String.format(resources.getString(R.string.temperature_text), it.temperature - 273.15)
+            addView(view)
+        }
+    }
 }
+
+

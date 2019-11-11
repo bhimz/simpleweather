@@ -43,7 +43,7 @@ class PlaceUtilImpl(private val placesClient: PlacesClient) : PlaceUtil {
             if (latLng == null || name == null) {
                 null
             } else {
-                Location(name, latLng.latitude, latLng.longitude)
+                Location(0, name, latLng.latitude, latLng.longitude)
             }
         }
     }

@@ -8,24 +8,9 @@ data class Weather(
 )
 
 data class Location(
+    val id: Int = 0,
     val locationName: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0
-)
-
-data class LocationBindingModel(
-    val locationName: String,
-    val latitude: Double,
-    val longitude: Double,
-    var currentWeather: String = "",
-    var weatherIconUrl: String? = null,
-    var temperature: Double = 0.0
-)
-
-data class WeatherBindingModel(
-    val date: Long,
-    val name: String,
-    val temperature: Double,
-    val weatherIconUrl: String? = null
 )
 

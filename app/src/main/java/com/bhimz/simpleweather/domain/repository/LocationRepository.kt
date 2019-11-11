@@ -19,6 +19,6 @@ class LocationRepository(private val locationDao: LocationDao) {
     }
 }
 
-fun Location.toLocationData(): LocationData = LocationData(locationName, latitude, longitude)
+fun Location.toLocationData(): LocationData = LocationData(id, locationName, latitude, longitude)
 
-fun LocationData.toLocation(): Location = Location(locationName, latitude, longitude)
+fun LocationData.toLocation(): Location = Location(id, locationName, latitude, longitude)
