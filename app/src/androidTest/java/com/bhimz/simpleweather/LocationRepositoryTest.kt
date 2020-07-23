@@ -47,7 +47,7 @@ class LocationRepositoryTest : KoinTest {
         val locationName = "Jakarta"
         val lat = -6.117664
         val lon = 106.906349
-        val location = Location(locationName, lat, lon)
+        val location = Location(0, locationName, lat, lon)
 
         runBlocking {
             //when
@@ -80,10 +80,10 @@ class LocationRepositoryTest : KoinTest {
 
         runBlocking {
             try {
-                locationRepository.saveLocation(Location(locationName, lat, lon))
+                locationRepository.saveLocation(Location(0, locationName, lat, lon))
 
                 //when user replace location
-                locationRepository.saveLocation(Location(locationName, newLat, newLon))
+                locationRepository.saveLocation(Location(0, locationName, newLat, newLon))
 
                 val savedLocationData = locationDao.getLocationData(locationName)
                 assertTrue("saved location should not be null", savedLocationData != null)
