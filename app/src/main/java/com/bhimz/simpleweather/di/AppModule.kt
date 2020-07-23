@@ -57,7 +57,7 @@ val netModule = module {
     }
     single {
         OkHttpClient.Builder()
-            .addInterceptor(get())
+            .addInterceptor(get() as Interceptor)
             .build() }
     single {
         GsonBuilder()
