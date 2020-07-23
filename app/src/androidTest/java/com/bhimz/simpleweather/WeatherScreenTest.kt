@@ -7,7 +7,6 @@ import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
-import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -15,14 +14,15 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.bhimz.simpleweather.di.appModule
-import com.bhimz.simpleweather.di.netModule
 import com.bhimz.simpleweather.di.testDbModule
 import com.bhimz.simpleweather.domain.db.dao.LocationDao
 import com.bhimz.simpleweather.domain.model.Location
 import com.bhimz.simpleweather.domain.model.LocationData
 import com.bhimz.simpleweather.domain.model.WeatherData
 import com.bhimz.simpleweather.domain.net.WeatherApi
+import com.bhimz.simpleweather.matcher.withRecyclerView
 import com.bhimz.simpleweather.util.PlaceUtil
+import com.bhimz.simpleweather.util.delayedTest
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matcher
@@ -60,7 +60,7 @@ class WeatherScreenTest : KoinTest {
             )
         }
         currentLocation = Location(0, "Jakarta Utara", 35.0, 105.11)
-        savedLocations = emptyList()
+        savedLocations = listOf()
     }
 
     @After
@@ -71,13 +71,7 @@ class WeatherScreenTest : KoinTest {
     @Test
     fun testOpenWeatherScreen() {
         openMainScreen()
-        onView(withId(R.id.locationListView)).check(matches(isDisplayed()))
-        onView(withId(R.id.locationListView)).check { view, noViewFoundException ->
-            if (noViewFoundException != null) throw noViewFoundException
-            view as RecyclerView
-            assertTrue("should have adapter set", view.adapter != null)
-            assertTrue("should have element inside ", view.adapter!!.itemCount > 0)
-        }
+        verifyLocationListIsShown()
         verifyCurrentLocationIsCorrect()
     }
 
@@ -88,16 +82,19 @@ class WeatherScreenTest : KoinTest {
             Location(2, "Jakarta Barat", 25.0, 101.11)
         )
         openMainScreen()
-        onView(withId(R.id.locationListView)).check(matches(isDisplayed()))
-        onView(withId(R.id.locationListView)).check { view, noViewFoundException ->
-            if (noViewFoundException != null) throw noViewFoundException
-            view as RecyclerView
-            assertTrue("should have adapter set", view.adapter != null)
-            assertTrue("should have element inside ", view.adapter!!.itemCount > 0)
-        }
-        Thread.sleep(1000)
+        verifyLocationListIsShown()
         verifyCurrentLocationIsCorrect()
         verifySavedLocationsAreCorrect()
+    }
+
+    @Test
+    fun testOpenCurrentLocationWeatherDetail() {
+        openMainScreen()
+        onView(
+            withRecyclerView(R.id.locationListView)
+                .atPositionOnView(1, R.id.openDetailBtn)
+        ).perform(click())
+        verifyNavigateToWeatherDetail()
     }
 
     /*@Test
@@ -214,7 +211,7 @@ class WeatherScreenTest : KoinTest {
     }*/
 
     private fun openMainScreen() {
-        initModules()
+        initTestPreconditions()
         launchFragmentInContainer(Bundle(), R.style.AppTheme) {
             WeatherFragment().also { fragment ->
                 fragment.viewLifecycleOwnerLiveData.observeForever {
@@ -229,7 +226,12 @@ class WeatherScreenTest : KoinTest {
         }
     }
 
-    private fun initModules() {
+    private fun initTestPreconditions() {
+        initDependency()
+        initSavedLocations()
+    }
+
+    private fun initDependency() {
         val mockPlaceUtil: PlaceUtil = mock {
             onBlocking { findCurrentPlace() } doReturn currentLocation
         }
@@ -251,6 +253,9 @@ class WeatherScreenTest : KoinTest {
                 testDbModule
             )
         )
+    }
+
+    private fun initSavedLocations() {
         val locationDao: LocationDao by inject()
         runBlocking {
             savedLocations.forEach { d ->
@@ -292,20 +297,24 @@ class WeatherScreenTest : KoinTest {
             mockWeatherDataSet["${location.latitude}@${location.longitude}"]
                 ?: throw AssertionError("should have matching weather data")
 
-        onView(itemMatcher).check(
-            matches(
-                hasDescendant(
-                    withText(location.locationName)
+        delayedTest {
+            onView(itemMatcher).check(
+                matches(
+                    hasDescendant(
+                        withText(location.locationName)
+                    )
                 )
             )
-        )
-        onView(itemMatcher).check(
-            matches(
-                hasDescendant(
-                    withText(weather.weatherCondition)
+        }
+        delayedTest {
+            onView(itemMatcher).check(
+                matches(
+                    hasDescendant(
+                        withText(weather.weatherCondition)
+                    )
                 )
             )
-        )
+        }
 
         val expectedTemperature = String.format(
             context.getString(R.string.temperature_text),
@@ -318,6 +327,17 @@ class WeatherScreenTest : KoinTest {
                 )
             )
         )
+    }
+
+    private fun verifyLocationListIsShown() = delayedTest {
+        onView(withId(R.id.locationListView)).check(matches(isDisplayed()))
+    }
+
+    private fun verifyNavigateToWeatherDetail() {
+        val captor = argumentCaptor<NavDirections>()
+        verify(mockNavController).navigate(captor.capture())
+        val navDir = captor.firstValue
+        assertEquals(R.id.actionOpenWeatherDetail, navDir.actionId)
     }
 
     companion object {

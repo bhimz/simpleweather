@@ -81,6 +81,7 @@
                 tools:text="@sample/location_item_list.json/data/temperature" />
 
             <TextView
+                android:id="@+id/openDetailBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"

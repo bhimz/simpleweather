@@ -1,4 +1,4 @@
-package com.bhimz.simpleweather
+package com.bhimz.simpleweather.matcher
 
 import android.content.res.Resources
 import android.view.View
@@ -42,4 +42,5 @@ class RecyclerViewMatcher(private val id: Int) {
         }
 }
 
-fun withRecyclerView(id: Int) = RecyclerViewMatcher(id)
+fun withRecyclerView(id: Int) =
+    RecyclerViewMatcher(id)
